@@ -1421,17 +1421,19 @@ select.form-control {
 
 .project-assignment {
   background-color: var(--color-bg-5);
-  border: 1px solid var(--color-border);
+  border: 2px dashed var(--color-border);
   border-radius: var(--radius-base);
   padding: var(--space-16);
   margin-bottom: var(--space-16);
-  min-height: 150px;
+  min-height: 200px;
   transition: all var(--duration-fast) var(--ease-standard);
+  display: flex;
+  flex-direction: column;
 }
 
 .project-assignment.drag-over {
   background-color: var(--color-bg-8);
-  border: 2px dashed var(--color-primary);
+  border-color: var(--color-primary);
 }
 
 .assignment-header {
@@ -1439,6 +1441,7 @@ select.form-control {
   justify-content: space-between;
   align-items: center;
   margin-bottom: var(--space-12);
+  flex-shrink: 0;
 }
 
 .assignment-title {
@@ -1456,8 +1459,19 @@ select.form-control {
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
+  flex-grow: 1;
 }
 
+.assigned-laborers-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  height: 100%;
+  min-height: 100px;
+}
 /* Enhanced Modal Styles */
 .modal {
   position: fixed;
