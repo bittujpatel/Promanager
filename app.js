@@ -4,67 +4,40 @@ let appState = {
     currentDate: new Date().toISOString().split('T')[0],
     nextLaborerId: 7,
     nextProjectId: 4,
-    nextMaterialId: 8,
+    nextMaterialId: 1,
+    nextPaymentId: 1,
     selectedLaborers: [],
     pendingAssignment: null,
     projects: [
         {
             id: 1,
-            name: "Residential Complex A",
-            location: "Mumbai, Maharashtra",
+            name: "Project 1",
+            location: "Bangalore, Karnataka",
             startDate: "2024-01-15",
             endDate: "2024-12-31",
-            budget: 5000000,
             status: "In Progress",
-            progress: 45,
-            materialCosts: [
-                {id: 1, item: "Cement", quantity: "50 bags", cost: 25000, date: "2024-08-15", supplier: "ACC Ltd"},
-                {id: 2, item: "Steel Rods", quantity: "2 tons", cost: 120000, date: "2024-08-18", supplier: "Tata Steel"},
-                {id: 3, item: "Bricks", quantity: "10000 pieces", cost: 35000, date: "2024-08-20", supplier: "Local Supplier"}
-            ],
-            milestones: [
-                {name: "Foundation", targetDate: "2024-03-01", actualDate: "2024-03-05", status: "Completed"},
-                {name: "Structure", targetDate: "2024-07-01", actualDate: null, status: "In Progress"},
-                {name: "Finishing", targetDate: "2024-11-01", actualDate: null, status: "Not Started"}
-            ]
+            materialCosts: [],
+            payments: []
         },
         {
             id: 2,
-            name: "Office Building B",
-            location: "Pune, Maharashtra", 
+            name: "Project 2",
+            location: "Hyderabad, Telangana",
             startDate: "2024-03-01",
             endDate: "2024-11-30",
-            budget: 8000000,
             status: "In Progress",
-            progress: 30,
-            materialCosts: [
-                {id: 4, item: "Glass Panels", quantity: "100 sqm", cost: 80000, date: "2024-08-10", supplier: "Guardian Glass"},
-                {id: 5, item: "Electrical Cables", quantity: "500m", cost: 45000, date: "2024-08-19", supplier: "Polycab"}
-            ],
-            milestones: [
-                {name: "Foundation", targetDate: "2024-04-15", actualDate: "2024-04-20", status: "Completed"},
-                {name: "Structure", targetDate: "2024-08-01", actualDate: null, status: "In Progress"},
-                {name: "Interiors", targetDate: "2024-10-15", actualDate: null, status: "Not Started"}
-            ]
+            materialCosts: [],
+            payments: []
         },
         {
             id: 3,
-            name: "Bridge Construction",
-            location: "Nashik, Maharashtra",
+            name: "Project 3",
+            location: "Chennai, Tamil Nadu",
             startDate: "2024-02-10",
             endDate: "2025-02-10",
-            budget: 12000000,
-            status: "In Progress",
-            progress: 25,
-            materialCosts: [
-                {id: 6, item: "Concrete Mix", quantity: "500 cubic meters", cost: 200000, date: "2024-08-12", supplier: "UltraTech"},
-                {id: 7, item: "Reinforcement Steel", quantity: "5 tons", cost: 300000, date: "2024-08-16", supplier: "SAIL"}
-            ],
-            milestones: [
-                {name: "Survey & Planning", targetDate: "2024-03-01", actualDate: "2024-02-28", status: "Completed"},
-                {name: "Foundation Work", targetDate: "2024-08-01", actualDate: null, status: "In Progress"},
-                {name: "Bridge Construction", targetDate: "2024-12-01", actualDate: null, status: "Not Started"}
-            ]
+            status: "Not Started",
+            materialCosts: [],
+            payments: []
         }
     ],
     laborers: [
@@ -76,8 +49,8 @@ let appState = {
             phone: "9876543210",
             status: "Active",
             skillLevel: "Expert",
-            totalDaysWorked: 45,
-            totalEarnings: 38400
+            totalDaysWorked: 0,
+            totalEarnings: 0
         },
         {
             id: 2,
@@ -87,8 +60,8 @@ let appState = {
             phone: "9876543211",
             status: "Active",
             skillLevel: "Helper",
-            totalDaysWorked: 40,
-            totalEarnings: 21000
+            totalDaysWorked: 0,
+            totalEarnings: 0
         },
         {
             id: 3,
@@ -98,8 +71,8 @@ let appState = {
             phone: "9876543212",
             status: "Active",
             skillLevel: "Skilled",
-            totalDaysWorked: 35,
-            totalEarnings: 38500
+            totalDaysWorked: 0,
+            totalEarnings: 0
         },
         {
             id: 4,
@@ -109,8 +82,8 @@ let appState = {
             phone: "9876543213",
             status: "Active",
             skillLevel: "Skilled",
-            totalDaysWorked: 38,
-            totalEarnings: 35550
+            totalDaysWorked: 0,
+            totalEarnings: 0
         },
         {
             id: 5,
@@ -120,8 +93,8 @@ let appState = {
             phone: "9876543214",
             status: "Active",
             skillLevel: "Skilled",
-            totalDaysWorked: 42,
-            totalEarnings: 33000
+            totalDaysWorked: 0,
+            totalEarnings: 0
         },
         {
             id: 6,
@@ -131,21 +104,12 @@ let appState = {
             phone: "9876543215",
             status: "Active",
             skillLevel: "Helper",
-            totalDaysWorked: 30,
-            totalEarnings: 14850
+            totalDaysWorked: 0,
+            totalEarnings: 0
         }
     ],
     attendance: {
-        "2024-08-20": {
-            "1": [{laborerId: 1, employmentType: "normal"}, {laborerId: 3, employmentType: "overtime"}, {laborerId: 5, employmentType: "normal"}],
-            "2": [{laborerId: 2, employmentType: "normal"}, {laborerId: 4, employmentType: "double"}],
-            "3": [{laborerId: 6, employmentType: "normal"}]
-        },
-        "2024-08-19": {
-            "1": [{laborerId: 1, employmentType: "normal"}, {laborerId: 2, employmentType: "normal"}, {laborerId: 5, employmentType: "overtime"}],
-            "2": [{laborerId: 3, employmentType: "normal"}, {laborerId: 4, employmentType: "normal"}, {laborerId: 6, employmentType: "night"}],
-            "3": []
-        }
+
     },
     employmentTypes: [
         {id: "normal", name: "Normal Shift", multiplier: 1.0, color: "#10B981"},
@@ -228,12 +192,12 @@ function updateDashboardMetrics() {
     const totalProjects = appState.projects.length;
     const activeLaborers = appState.laborers.filter(l => l.status === 'Active').length;
     const totalLaborCost = calculateTotalLaborCost();
-    const avgProgress = Math.round(appState.projects.reduce((sum, p) => sum + p.progress, 0) / appState.projects.length);
-
+    const totalPayments = appState.projects.reduce((sum, p) => sum + p.payments.reduce((s, payment) => s + payment.amount, 0), 0);
+    
     document.getElementById('totalProjects').textContent = totalProjects;
     document.getElementById('totalLaborers').textContent = activeLaborers;
     document.getElementById('totalLaborCost').textContent = formatCurrency(totalLaborCost);
-    document.getElementById('avgProgress').textContent = `${avgProgress}%`;
+    document.getElementById('totalPayments').textContent = formatCurrency(totalPayments);
 }
 
 function calculateTotalLaborCost() {
@@ -260,15 +224,16 @@ function renderProjectCostCards() {
         const laborCost = calculateProjectLaborCost(project.id);
         const materialCost = calculateProjectMaterialCost(project.id);
         const totalCost = laborCost + materialCost;
-        const budgetVariance = ((totalCost - project.budget) / project.budget) * 100;
-        const varianceClass = budgetVariance > 0 ? 'negative' : 'positive';
+        const budget = project.payments.reduce((sum, payment) => sum + payment.amount, 0);
+        const budgetVariance = budget > 0 ? ((totalCost / budget) * 100) : 0;
+        const varianceClass = budgetVariance > 100 ? 'negative' : 'positive';
 
         return `
             <div class="project-cost-card" onclick="showProjectDetails(${project.id})">
                 <div class="cost-card-header">
                     <h4 class="cost-card-title">${project.name}</h4>
                     <div class="cost-variance ${varianceClass}">
-                        ${budgetVariance > 0 ? '+' : ''}${budgetVariance.toFixed(1)}%
+                        ${budgetVariance.toFixed(1)}% Used
                     </div>
                 </div>
                 <div class="cost-breakdown">
@@ -282,7 +247,7 @@ function renderProjectCostCards() {
                     </div>
                     <div class="cost-item">
                         <span class="cost-label">Budget:</span>
-                        <span class="cost-value">${formatCurrency(project.budget)}</span>
+                        <span class="cost-value">${formatCurrency(budget)}</span>
                     </div>
                     <div class="cost-item cost-total">
                         <span class="cost-label">Total Spent:</span>
@@ -351,20 +316,24 @@ function initializeCostTrendsChart() {
 
 function generateCostTrendsData() {
     const colors = ['#1FB8CD', '#FFC185', '#B4413C'];
-    const labels = ['Jul 2024', 'Aug 2024', 'Sep 2024', 'Oct 2024'];
+    const labels = ['May 2024', 'Jun 2024', 'Jul 2024', 'Aug 2024'];
     
-    const datasets = appState.projects.map((project, index) => ({
-        label: project.name,
-        data: [
-            Math.random() * 500000 + 200000,
-            Math.random() * 600000 + 300000,
-            Math.random() * 700000 + 400000,
-            Math.random() * 800000 + 500000
-        ],
-        borderColor: colors[index % colors.length],
-        backgroundColor: colors[index % colors.length] + '20',
-        tension: 0.4
-    }));
+    const datasets = appState.projects.map((project, index) => {
+        const projectCosts = [
+            (calculateProjectLaborCost(project.id) + calculateProjectMaterialCost(project.id)) * 0.4,
+            (calculateProjectLaborCost(project.id) + calculateProjectMaterialCost(project.id)) * 0.6,
+            (calculateProjectLaborCost(project.id) + calculateProjectMaterialCost(project.id)) * 0.8,
+            calculateProjectLaborCost(project.id) + calculateProjectMaterialCost(project.id)
+        ];
+
+        return {
+            label: project.name,
+            data: projectCosts,
+            borderColor: colors[index % colors.length],
+            backgroundColor: colors[index % colors.length] + '20',
+            tension: 0.4
+        };
+    });
 
     return { labels, datasets };
 }
@@ -478,6 +447,7 @@ function renderProjectsGrid() {
         const laborCost = calculateProjectLaborCost(project.id);
         const materialCost = calculateProjectMaterialCost(project.id);
         const totalCost = laborCost + materialCost;
+        const budget = project.payments.reduce((sum, payment) => sum + payment.amount, 0);
 
         return `
             <div class="project-card" onclick="showProjectDetails(${project.id})">
@@ -495,7 +465,7 @@ function renderProjectsGrid() {
                 <div class="project-info">
                     <p><i class="fas fa-map-marker-alt"></i> ${project.location}</p>
                     <p><i class="fas fa-calendar"></i> ${formatDate(project.startDate)} - ${formatDate(project.endDate)}</p>
-                    <p><i class="fas fa-rupee-sign"></i> Budget: ${formatCurrency(project.budget)}</p>
+                    <p><i class="fas fa-rupee-sign"></i> Budget: ${formatCurrency(budget)}</p>
                     <p><span class="status-badge status-badge--${project.status.toLowerCase().replace(' ', '-')}">${project.status}</span></p>
                 </div>
                 <div class="project-summary">
@@ -510,15 +480,6 @@ function renderProjectsGrid() {
                     <div class="summary-item">
                         <span class="summary-value">${formatCurrency(totalCost)}</span>
                         <div class="summary-label">Total Spent</div>
-                    </div>
-                </div>
-                <div class="project-progress">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <span>Progress</span>
-                        <span>${project.progress}%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${project.progress}%"></div>
                     </div>
                 </div>
                 <button class="expand-btn" onclick="event.stopPropagation(); showProjectDetails(${project.id})">
@@ -542,20 +503,21 @@ function showProjectDetails(projectId) {
     const laborCost = calculateProjectLaborCost(project.id);
     const materialCost = calculateProjectMaterialCost(project.id);
     const totalCost = laborCost + materialCost;
-    const budgetVariance = totalCost - project.budget;
+    const budget = project.payments.reduce((sum, payment) => sum + payment.amount, 0);
+    const budgetVariance = totalCost - budget;
 
     content.innerHTML = `
         <div class="project-details-tabs">
             <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
             <button class="tab-btn" onclick="switchTab('materials')">Materials</button>
-            <button class="tab-btn" onclick="switchTab('milestones')">Milestones</button>
+            <button class="tab-btn" onclick="switchTab('payments')">Payments</button>
             <button class="tab-btn" onclick="switchTab('costs')">Cost Analysis</button>
         </div>
 
         <div id="overview-tab" class="tab-content active">
             <div class="project-summary">
                 <div class="summary-item">
-                    <span class="summary-value">${formatCurrency(project.budget)}</span>
+                    <span class="summary-value">${formatCurrency(budget)}</span>
                     <div class="summary-label">Budget</div>
                 </div>
                 <div class="summary-item">
@@ -565,10 +527,6 @@ function showProjectDetails(projectId) {
                 <div class="summary-item">
                     <span class="summary-value ${budgetVariance >= 0 ? 'text-error' : 'text-success'}">${formatCurrency(Math.abs(budgetVariance))}</span>
                     <div class="summary-label">${budgetVariance >= 0 ? 'Over Budget' : 'Under Budget'}</div>
-                </div>
-                <div class="summary-item">
-                    <span class="summary-value">${project.progress}%</span>
-                    <div class="summary-label">Progress</div>
                 </div>
             </div>
             <div class="project-info">
@@ -587,7 +545,7 @@ function showProjectDetails(projectId) {
                     </button>
                 </div>
                 <div class="materials-list">
-                    ${project.materialCosts.map(material => `
+                    ${project.materialCosts.length > 0 ? project.materialCosts.map(material => `
                         <div class="material-item">
                             <div class="material-info">
                                 <strong>${material.item}</strong> - ${material.quantity}
@@ -604,7 +562,7 @@ function showProjectDetails(projectId) {
                                 </button>
                             </div>
                         </div>
-                    `).join('')}
+                    `).join('') : '<p>No material costs recorded.</p>'}
                 </div>
                 <div class="cost-total" style="margin-top: 16px;">
                     <strong>Total Material Cost: ${formatCurrency(materialCost)}</strong>
@@ -612,20 +570,34 @@ function showProjectDetails(projectId) {
             </div>
         </div>
 
-        <div id="milestones-tab" class="tab-content">
-            <div class="materials-list">
-                ${project.milestones.map(milestone => `
-                    <div class="material-item">
-                        <div class="material-info">
-                            <strong>${milestone.name}</strong>
-                            <br>
-                            <small>Target: ${formatDate(milestone.targetDate)} ${milestone.actualDate ? `• Actual: ${formatDate(milestone.actualDate)}` : ''}</small>
+        <div id="payments-tab" class="tab-content">
+            <div class="material-costs-section">
+                <div class="section-header">
+                    <h4>Payments Received</h4>
+                    <button class="btn btn--primary btn--sm" onclick="openPaymentModal(${project.id})">
+                        <i class="fas fa-plus"></i> Add Payment
+                    </button>
+                </div>
+                <div class="materials-list">
+                    ${project.payments.length > 0 ? project.payments.map(payment => `
+                        <div class="material-item">
+                            <div class="material-info">
+                                <strong>Payment Received</strong>
+                                <br>
+                                <small>${formatDate(payment.date)}</small>
+                            </div>
+                            <div class="material-actions">
+                                <span class="font-semibold">${formatCurrency(payment.amount)}</span>
+                                <button class="btn btn--sm btn--danger" onclick="deletePayment(${project.id}, ${payment.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="material-actions">
-                            <span class="status-badge status-badge--${milestone.status.toLowerCase().replace(' ', '-')}">${milestone.status}</span>
-                        </div>
-                    </div>
-                `).join('')}
+                    `).join('') : '<p>No payments received.</p>'}
+                </div>
+                <div class="cost-total" style="margin-top: 16px;">
+                    <strong>Total Payments: ${formatCurrency(budget)}</strong>
+                </div>
             </div>
         </div>
 
@@ -641,7 +613,7 @@ function showProjectDetails(projectId) {
                 </div>
                 <div class="cost-item">
                     <span class="cost-label">Budget Allocated:</span>
-                    <span class="cost-value">${formatCurrency(project.budget)}</span>
+                    <span class="cost-value">${formatCurrency(budget)}</span>
                 </div>
                 <div class="cost-item cost-total">
                     <span class="cost-label">Total Spent:</span>
@@ -724,6 +696,36 @@ function deleteMaterial(projectId, materialId) {
     );
 }
 
+// Payment Management Functions
+function openPaymentModal(projectId) {
+    const modal = document.getElementById('paymentModal');
+    const form = document.getElementById('paymentForm');
+    
+    form.reset();
+    document.getElementById('paymentProjectId').value = projectId;
+    document.getElementById('paymentDate').value = appState.currentDate;
+    
+    modal.classList.remove('hidden');
+}
+
+function closePaymentModal() {
+    document.getElementById('paymentModal').classList.add('hidden');
+}
+
+function deletePayment(projectId, paymentId) {
+    const project = appState.projects.find(p => p.id === projectId);
+    const payment = project.payments.find(p => p.id === paymentId);
+
+    showConfirmModal(
+        `Delete payment of ${formatCurrency(payment.amount)}?`,
+        () => {
+            project.payments = project.payments.filter(p => p.id !== paymentId);
+            showProjectDetails(projectId);
+            showToast('Payment deleted successfully', 'success');
+        }
+    );
+}
+
 // Enhanced Attendance Management Functions
 function initializeDatePicker() {
     const dateInput = document.getElementById('attendanceDate');
@@ -773,9 +775,6 @@ function renderAvailableLaborers() {
     // Add drag event listeners
     container.querySelectorAll('.laborer-item').forEach(item => {
         item.addEventListener('dragstart', handleDragStart);
-        item.addEventListener('click', function() {
-            selectLaborer(parseInt(this.dataset.laborerId));
-        });
     });
 }
 
@@ -797,7 +796,7 @@ function renderProjectAssignments() {
                     <div class="assignment-cost">${formatCurrency(totalCost)}</div>
                 </div>
                 <div class="assigned-laborers">
-                    ${assignedLaborers.map(assignment => `
+                    ${assignedLaborers.length > 0 ? assignedLaborers.map(assignment => `
                         <div class="laborer-item" data-laborer-id="${assignment.laborer.id}" onclick="unassignLaborer(${assignment.laborer.id})">
                             <div class="laborer-name">${assignment.laborer.name}</div>
                             <div class="laborer-details">
@@ -805,7 +804,7 @@ function renderProjectAssignments() {
                                 <div class="employment-type-indicator-small" style="background-color: ${assignment.color}" title="${assignment.employmentTypeName}"></div>
                             </div>
                         </div>
-                    `).join('')}
+                    `).join('') : '<div class="assigned-laborers-placeholder">Drop a laborer here</div>'}
                 </div>
             </div>
         `;
@@ -850,23 +849,12 @@ function getAssignedLaborersForProject(projectId, date) {
     }).filter(a => a.laborer);
 }
 
-function selectLaborer(laborerId) {
-    document.querySelectorAll('.laborer-item').forEach(item => {
-        item.classList.remove('selected');
-    });
-    document.querySelector(`[data-laborer-id="${laborerId}"]`).classList.add('selected');
-    
-    // Show employment type selection
-    appState.selectedLaborerId = laborerId;
-    showEmploymentTypeModal();
-}
-
-function showEmploymentTypeModal() {
+function showEmploymentTypeModal(onSelect) {
     const modal = document.getElementById('employmentTypeModal');
     const container = document.getElementById('employmentTypesList');
     
     container.innerHTML = appState.employmentTypes.map(type => `
-        <div class="employment-type-option" onclick="selectEmploymentType('${type.id}')">
+        <div class="employment-type-option" data-employment-type-id="${type.id}">
             <div class="employment-type-indicator" style="background-color: ${type.color}"></div>
             <div class="employment-type-info">
                 <div class="employment-type-name">${type.name}</div>
@@ -874,24 +862,15 @@ function showEmploymentTypeModal() {
             </div>
         </div>
     `).join('');
-    
-    modal.classList.remove('hidden');
-}
 
-function selectEmploymentType(employmentTypeId) {
-    appState.pendingAssignment = {
-        laborerId: appState.selectedLaborerId,
-        employmentType: employmentTypeId
-    };
-    closeEmploymentTypeModal();
-    
-    // Highlight drop zones
-    document.querySelectorAll('.drop-zone').forEach(zone => {
-        zone.style.border = '2px dashed var(--color-primary)';
-        zone.style.backgroundColor = 'var(--color-bg-1)';
+    container.querySelectorAll('.employment-type-option').forEach(option => {
+        option.onclick = () => {
+            onSelect(option.dataset.employmentTypeId);
+            closeEmploymentTypeModal();
+        };
     });
     
-    showToast('Select a project to assign the laborer', 'info');
+    modal.classList.remove('hidden');
 }
 
 function closeEmploymentTypeModal() {
@@ -910,8 +889,9 @@ function renderEmploymentLegend() {
 
 function handleDragStart(e) {
     e.dataTransfer.setData('text/plain', e.target.dataset.laborerId);
-    e.target.classList.add('dragging');
-    appState.draggingLaborerId = parseInt(e.target.dataset.laborerId);
+    setTimeout(() => {
+        e.target.classList.add('dragging');
+    }, 0);
 }
 
 function handleDragOver(e) {
@@ -930,22 +910,9 @@ function handleDrop(e) {
     const laborerId = parseInt(e.dataTransfer.getData('text/plain'));
     const projectId = parseInt(e.currentTarget.dataset.projectId);
     
-    if (appState.pendingAssignment && appState.pendingAssignment.laborerId === laborerId) {
-        // Use pending assignment with employment type
-        assignLaborerToProject(laborerId, projectId, appState.pendingAssignment.employmentType);
-        appState.pendingAssignment = null;
-        
-        // Reset drop zone highlighting
-        document.querySelectorAll('.drop-zone').forEach(zone => {
-            zone.style.border = '';
-            zone.style.backgroundColor = '';
-        });
-    } else {
-        // Show employment type selection for drag & drop
-        appState.selectedLaborerId = laborerId;
-        appState.targetProjectId = projectId;
-        showEmploymentTypeModal();
-    }
+    showEmploymentTypeModal(employmentType => {
+        assignLaborerToProject(laborerId, projectId, employmentType);
+    });
 }
 
 function assignLaborerToProject(laborerId, projectId, employmentType = 'normal') {
@@ -1097,10 +1064,15 @@ function initializeForms() {
             saveMaterial();
         });
     }
-}
 
-function updateProgressValue(value) {
-    document.getElementById('progressValue').textContent = value;
+    // Payment form
+    const paymentForm = document.getElementById('paymentForm');
+    if (paymentForm) {
+        paymentForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            savePayment();
+        });
+    }
 }
 
 function openLaborerModal(laborerId = null) {
@@ -1214,16 +1186,11 @@ function openProjectModal(projectId = null) {
             document.getElementById('projectLocation').value = project.location;
             document.getElementById('projectStartDate').value = project.startDate;
             document.getElementById('projectEndDate').value = project.endDate;
-            document.getElementById('projectBudget').value = project.budget;
             document.getElementById('projectStatus').value = project.status;
-            document.getElementById('projectProgress').value = project.progress;
-            document.getElementById('progressValue').textContent = project.progress;
         }
     } else {
         title.textContent = 'Add Project';
         document.getElementById('projectStatus').value = 'Not Started';
-        document.getElementById('projectProgress').value = 0;
-        document.getElementById('progressValue').textContent = '0';
     }
     
     modal.classList.remove('hidden');
@@ -1242,18 +1209,16 @@ function saveProject() {
         location: document.getElementById('projectLocation').value,
         startDate: document.getElementById('projectStartDate').value,
         endDate: document.getElementById('projectEndDate').value,
-        budget: parseInt(document.getElementById('projectBudget').value),
         status: document.getElementById('projectStatus').value,
-        progress: parseInt(document.getElementById('projectProgress').value),
         materialCosts: [],
-        milestones: []
+        payments: []
     };
 
     const existingIndex = appState.projects.findIndex(p => p.id === project.id);
     if (existingIndex !== -1) {
-        // Preserve existing material costs and milestones
+        // Preserve existing material costs and payments
         project.materialCosts = appState.projects[existingIndex].materialCosts;
-        project.milestones = appState.projects[existingIndex].milestones;
+        project.payments = appState.projects[existingIndex].payments;
         appState.projects[existingIndex] = project;
         showToast('Project updated successfully', 'success');
     } else {
@@ -1327,6 +1292,27 @@ function saveMaterial() {
     renderProjectCostCards();
 }
 
+function savePayment() {
+    const projectId = parseInt(document.getElementById('paymentProjectId').value);
+    
+    const payment = {
+        id: appState.nextPaymentId++,
+        amount: parseInt(document.getElementById('paymentAmount').value),
+        date: document.getElementById('paymentDate').value
+    };
+
+    const project = appState.projects.find(p => p.id === projectId);
+    if (!project.payments) project.payments = [];
+    
+    project.payments.push(payment);
+    showToast('Payment added successfully', 'success');
+
+    closePaymentModal();
+    showProjectDetails(projectId);
+    renderProjectCostCards();
+    updateDashboardMetrics();
+}
+
 // Enhanced Modal Functions
 function showConfirmModal(message, onConfirm, details = '') {
     document.getElementById('confirmMessage').textContent = message;
@@ -1384,10 +1370,9 @@ function exportDashboardData() {
     const data = {
         projects: appState.projects.map(project => ({
             name: project.name,
-            budget: project.budget,
+            budget: project.payments.reduce((sum, p) => sum + p.amount, 0),
             laborCost: calculateProjectLaborCost(project.id),
             materialCost: calculateProjectMaterialCost(project.id),
-            progress: project.progress,
             status: project.status
         }))
     };
