@@ -1,21 +1,12 @@
-// Enhanced Project Management Application - Fully Functional Version
+// Enhanced Application State with extended data structure
 let appState = {
     currentPage: 'dashboard',
     currentDate: new Date().toISOString().split('T')[0],
     nextLaborerId: 7,
     nextProjectId: 4,
-    nextMaterialId: 10,
-    
-    // Employment type multipliers
-    employmentTypes: {
-        "normal": {"label": "Normal", "multiplier": 1.0},
-        "overtime": {"label": "Overtime", "multiplier": 1.5},
-        "double_shift": {"label": "Double Shift", "multiplier": 2.0},
-        "night_shift": {"label": "Night Shift", "multiplier": 1.25},
-        "holiday": {"label": "Holiday", "multiplier": 2.0}
-    },
-
-    // Projects with material costs
+    nextMaterialId: 8,
+    selectedLaborers: [],
+    pendingAssignment: null,
     projects: [
         {
             id: 1,
@@ -27,23 +18,33 @@ let appState = {
             status: "In Progress",
             progress: 45,
             materialCosts: [
-                {id: 1, date: "2024-08-01", description: "Cement and Steel", amount: 150000, category: "Raw Materials"},
-                {id: 2, date: "2024-08-10", description: "Electrical Wiring", amount: 75000, category: "Electrical"},
-                {id: 3, date: "2024-08-15", description: "Plumbing Materials", amount: 45000, category: "Plumbing"}
+                {id: 1, item: "Cement", quantity: "50 bags", cost: 25000, date: "2024-08-15", supplier: "ACC Ltd"},
+                {id: 2, item: "Steel Rods", quantity: "2 tons", cost: 120000, date: "2024-08-18", supplier: "Tata Steel"},
+                {id: 3, item: "Bricks", quantity: "10000 pieces", cost: 35000, date: "2024-08-20", supplier: "Local Supplier"}
+            ],
+            milestones: [
+                {name: "Foundation", targetDate: "2024-03-01", actualDate: "2024-03-05", status: "Completed"},
+                {name: "Structure", targetDate: "2024-07-01", actualDate: null, status: "In Progress"},
+                {name: "Finishing", targetDate: "2024-11-01", actualDate: null, status: "Not Started"}
             ]
         },
         {
             id: 2,
             name: "Office Building B",
-            location: "Pune, Maharashtra",
+            location: "Pune, Maharashtra", 
             startDate: "2024-03-01",
             endDate: "2024-11-30",
             budget: 8000000,
             status: "In Progress",
             progress: 30,
             materialCosts: [
-                {id: 4, date: "2024-08-05", description: "Glass and Aluminium", amount: 200000, category: "Facade"},
-                {id: 5, date: "2024-08-12", description: "HVAC Equipment", amount: 180000, category: "HVAC"}
+                {id: 4, item: "Glass Panels", quantity: "100 sqm", cost: 80000, date: "2024-08-10", supplier: "Guardian Glass"},
+                {id: 5, item: "Electrical Cables", quantity: "500m", cost: 45000, date: "2024-08-19", supplier: "Polycab"}
+            ],
+            milestones: [
+                {name: "Foundation", targetDate: "2024-04-15", actualDate: "2024-04-20", status: "Completed"},
+                {name: "Structure", targetDate: "2024-08-01", actualDate: null, status: "In Progress"},
+                {name: "Interiors", targetDate: "2024-10-15", actualDate: null, status: "Not Started"}
             ]
         },
         {
@@ -56,1522 +57,766 @@ let appState = {
             status: "In Progress",
             progress: 25,
             materialCosts: [
-                {id: 6, date: "2024-08-03", description: "Steel Beams", amount: 350000, category: "Structural"},
-                {id: 7, date: "2024-08-18", description: "Concrete", amount: 120000, category: "Raw Materials"}
+                {id: 6, item: "Concrete Mix", quantity: "500 cubic meters", cost: 200000, date: "2024-08-12", supplier: "UltraTech"},
+                {id: 7, item: "Reinforcement Steel", quantity: "5 tons", cost: 300000, date: "2024-08-16", supplier: "SAIL"}
+            ],
+            milestones: [
+                {name: "Survey & Planning", targetDate: "2024-03-01", actualDate: "2024-02-28", status: "Completed"},
+                {name: "Foundation Work", targetDate: "2024-08-01", actualDate: null, status: "In Progress"},
+                {name: "Bridge Construction", targetDate: "2024-12-01", actualDate: null, status: "Not Started"}
             ]
         }
     ],
-
     laborers: [
-        {id: 1, name: "Rajesh Kumar", role: "Mason", dailyRate: 800, phone: "9876543210", status: "Active"},
-        {id: 2, name: "Amit Singh", role: "Helper", dailyRate: 500, phone: "9876543211", status: "Active"},
-        {id: 3, name: "Priya Sharma", role: "Electrician", dailyRate: 1000, phone: "9876543212", status: "Active"},
-        {id: 4, name: "Vikram Patel", role: "Plumber", dailyRate: 900, phone: "9876543213", status: "Active"},
-        {id: 5, name: "Sunita Yadav", role: "Mason", dailyRate: 750, phone: "9876543214", status: "Active"},
-        {id: 6, name: "Rahul Gupta", role: "Helper", dailyRate: 450, phone: "9876543215", status: "Active"}
+        {
+            id: 1,
+            name: "Rajesh Kumar",
+            role: "Mason",
+            dailyRate: 800,
+            phone: "9876543210",
+            status: "Active",
+            skillLevel: "Expert",
+            totalDaysWorked: 45,
+            totalEarnings: 38400
+        },
+        {
+            id: 2,
+            name: "Amit Singh",
+            role: "Helper",
+            dailyRate: 500,
+            phone: "9876543211",
+            status: "Active",
+            skillLevel: "Helper",
+            totalDaysWorked: 40,
+            totalEarnings: 21000
+        },
+        {
+            id: 3,
+            name: "Priya Sharma",
+            role: "Electrician",
+            dailyRate: 1000,
+            phone: "9876543212",
+            status: "Active",
+            skillLevel: "Skilled",
+            totalDaysWorked: 35,
+            totalEarnings: 38500
+        },
+        {
+            id: 4,
+            name: "Vikram Patel",
+            role: "Plumber",
+            dailyRate: 900,
+            phone: "9876543213",
+            status: "Active",
+            skillLevel: "Skilled",
+            totalDaysWorked: 38,
+            totalEarnings: 35550
+        },
+        {
+            id: 5,
+            name: "Sunita Yadav",
+            role: "Mason",
+            dailyRate: 750,
+            phone: "9876543214",
+            status: "Active",
+            skillLevel: "Skilled",
+            totalDaysWorked: 42,
+            totalEarnings: 33000
+        },
+        {
+            id: 6,
+            name: "Rahul Gupta",
+            role: "Helper",
+            dailyRate: 450,
+            phone: "9876543215",
+            status: "Active",
+            skillLevel: "Helper",
+            totalDaysWorked: 30,
+            totalEarnings: 14850
+        }
     ],
-
-    // Enhanced attendance with employment types
     attendance: {
         "2024-08-20": {
-            "1": [
-                {laborerId: 1, employmentType: "normal"},
-                {laborerId: 3, employmentType: "overtime"},
-                {laborerId: 5, employmentType: "normal"}
-            ],
-            "2": [
-                {laborerId: 2, employmentType: "double_shift"},
-                {laborerId: 4, employmentType: "normal"}
-            ],
-            "3": [
-                {laborerId: 6, employmentType: "night_shift"}
-            ]
+            "1": [{laborerId: 1, employmentType: "normal"}, {laborerId: 3, employmentType: "overtime"}, {laborerId: 5, employmentType: "normal"}],
+            "2": [{laborerId: 2, employmentType: "normal"}, {laborerId: 4, employmentType: "double"}],
+            "3": [{laborerId: 6, employmentType: "normal"}]
         },
         "2024-08-19": {
-            "1": [
-                {laborerId: 1, employmentType: "normal"},
-                {laborerId: 2, employmentType: "normal"},
-                {laborerId: 5, employmentType: "overtime"}
-            ],
-            "2": [
-                {laborerId: 3, employmentType: "normal"},
-                {laborerId: 4, employmentType: "night_shift"},
-                {laborerId: 6, employmentType: "normal"}
-            ],
+            "1": [{laborerId: 1, employmentType: "normal"}, {laborerId: 2, employmentType: "normal"}, {laborerId: 5, employmentType: "overtime"}],
+            "2": [{laborerId: 3, employmentType: "normal"}, {laborerId: 4, employmentType: "normal"}, {laborerId: 6, employmentType: "night"}],
             "3": []
-        },
-        "2024-08-18": {
-            "1": [
-                {laborerId: 1, employmentType: "holiday"},
-                {laborerId: 5, employmentType: "holiday"}
-            ],
-            "2": [
-                {laborerId: 2, employmentType: "holiday"},
-                {laborerId: 3, employmentType: "holiday"},
-                {laborerId: 4, employmentType: "holiday"}
-            ],
-            "3": [
-                {laborerId: 6, employmentType: "holiday"}
-            ]
         }
-    }
+    },
+    employmentTypes: [
+        {id: "normal", name: "Normal Shift", multiplier: 1.0, color: "#10B981"},
+        {id: "overtime", name: "Overtime", multiplier: 1.5, color: "#F59E0B"},
+        {id: "double", name: "Double Shift", multiplier: 2.0, color: "#EF4444"},
+        {id: "night", name: "Night Shift", multiplier: 1.25, color: "#8B5CF6"},
+        {id: "holiday", name: "Holiday Work", multiplier: 2.5, color: "#EC4899"}
+    ]
 };
 
-// Global variables
-let charts = { laborCostChart: null };
-let confirmCallback = null;
+// Chart instances
+let charts = {
+    costTrendsChart: null
+};
 
-// DOM Ready - Initialize everything
+// Initialize Application
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Initializing application...');
-    initializeApp();
+    initializeNavigation();
+    initializeDatePicker();
+    initializeSearch();
+    initializeForms();
+    initializeFilters();
+    showPage('dashboard');
 });
 
-// Main initialization
-function initializeApp() {
-    try {
-        setupNavigation();
-        setupEventListeners();
-        setupForms();
-        setupModals();
-        setupDatePicker();
-        showPage('dashboard');
-        console.log('Application initialized successfully');
-    } catch (error) {
-        console.error('Error initializing app:', error);
-    }
-}
-
-// Navigation Setup - FIXED
-function setupNavigation() {
-    console.log('Setting up navigation...');
-    
-    // Clear any existing event listeners and setup new ones
+// Navigation Functions
+function initializeNavigation() {
     const navLinks = document.querySelectorAll('.nav-link');
     navLinks.forEach(link => {
-        const pageId = link.getAttribute('data-page');
-        
-        // Remove existing listeners
-        link.removeEventListener('click', handleNavClick);
-        
-        // Add new listener
         link.addEventListener('click', function(e) {
             e.preventDefault();
-            e.stopPropagation();
-            console.log('Navigation clicked:', pageId);
-            
-            if (pageId) {
-                showPage(pageId);
-            }
+            const page = this.dataset.page;
+            showPage(page);
         });
     });
 }
 
-function handleNavClick(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    const pageId = this.getAttribute('data-page');
-    if (pageId) {
-        showPage(pageId);
-    }
-}
-
-// Page Navigation - FIXED
 function showPage(pageId) {
-    console.log(`Navigating to page: ${pageId}`);
-    
-    try {
-        // Update active navigation
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.remove('active');
-        });
-        
-        const activeLink = document.querySelector(`[data-page="${pageId}"]`);
-        if (activeLink) {
-            activeLink.classList.add('active');
-        }
+    // Update navigation
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    document.querySelector(`[data-page="${pageId}"]`).classList.add('active');
 
-        // Show target page
-        document.querySelectorAll('.page').forEach(page => {
-            page.classList.remove('active');
-        });
-        
-        const targetPage = document.getElementById(pageId);
-        if (targetPage) {
-            targetPage.classList.add('active');
-            appState.currentPage = pageId;
+    // Update pages
+    document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+    });
+    document.getElementById(pageId).classList.add('active');
 
-            // Load page content
-            switch(pageId) {
-                case 'dashboard':
-                    loadDashboard();
-                    break;
-                case 'projects':
-                    loadProjects();
-                    break;
-                case 'attendance':
-                    loadAttendance();
-                    break;
-                case 'laborers':
-                    loadLaborers();
-                    break;
-            }
-        }
-    } catch (error) {
-        console.error('Error showing page:', error);
-    }
-}
+    appState.currentPage = pageId;
 
-// Event Listeners Setup - FIXED
-function setupEventListeners() {
-    console.log('Setting up event listeners...');
-    
-    // Dashboard refresh button
-    const refreshBtn = document.querySelector('button[onclick="refreshDashboard()"]');
-    if (refreshBtn) {
-        refreshBtn.onclick = null; // Remove inline onclick
-        refreshBtn.addEventListener('click', function(e) {
-            e.preventDefault();
+    // Load page content
+    switch(pageId) {
+        case 'dashboard':
             loadDashboard();
-        });
-    }
-
-    // Add Project Button
-    setupButton('addProjectBtn', function() {
-        console.log('Add Project button clicked');
-        openProjectModal();
-    });
-
-    // Add Laborer Button  
-    setupButton('addLaborerBtn', function() {
-        console.log('Add Laborer button clicked');
-        openLaborerModal();
-    });
-
-    // Date navigation
-    setupButton('prevDateBtn', function() {
-        changeDate(-1);
-    });
-    
-    setupButton('nextDateBtn', function() {
-        changeDate(1);
-    });
-    
-    setupButton('copyPrevDayBtn', function() {
-        copyPreviousDay();
-    });
-
-    // Search functionality
-    const projectSearch = document.getElementById('projectSearch');
-    if (projectSearch) {
-        projectSearch.addEventListener('input', filterProjects);
-    }
-    
-    const laborerSearch = document.getElementById('laborerSearch');
-    if (laborerSearch) {
-        laborerSearch.addEventListener('input', renderLaborersEnhancedGrid);
-    }
-
-    // Date picker
-    const dateInput = document.getElementById('attendanceDate');
-    if (dateInput) {
-        dateInput.addEventListener('change', function() {
-            appState.currentDate = this.value;
+            break;
+        case 'laborers':
+            loadLaborers();
+            break;
+        case 'projects':
+            loadProjects();
+            break;
+        case 'attendance':
             loadAttendance();
-        });
-    }
-
-    // Global keyboard events
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeAllModals();
-        }
-    });
-
-    // Modal backdrop clicks
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('modal')) {
-            closeAllModals();
-        }
-    });
-}
-
-function setupButton(buttonId, clickHandler) {
-    const button = document.getElementById(buttonId);
-    if (button) {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            clickHandler();
-        });
-    } else {
-        console.warn(`Button ${buttonId} not found`);
+            break;
     }
 }
 
-// Forms Setup - FIXED
-function setupForms() {
-    console.log('Setting up forms...');
-    
-    // Project form
-    const projectForm = document.getElementById('projectForm');
-    if (projectForm) {
-        projectForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            if (validateProjectForm()) {
-                saveProject();
-            }
-        });
-    }
-
-    // Material form
-    const materialForm = document.getElementById('materialForm');
-    if (materialForm) {
-        materialForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            if (validateMaterialForm()) {
-                saveMaterial();
-            }
-        });
-    }
-
-    // Laborer form
-    const laborerForm = document.getElementById('laborerForm');
-    if (laborerForm) {
-        laborerForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            if (validateLaborerForm()) {
-                saveLaborer();
-            }
-        });
-    }
-}
-
-// Modal Setup - FIXED
-function setupModals() {
-    console.log('Setting up modals...');
-    
-    // Close buttons
-    const modalCloseButtons = [
-        'closeProjectModalBtn',
-        'closeMaterialModalBtn', 
-        'closeAssignmentModalBtn',
-        'closeLaborerModalBtn'
-    ];
-    
-    modalCloseButtons.forEach(btnId => {
-        setupButton(btnId, closeAllModals);
-    });
-
-    // Cancel buttons
-    const cancelButtons = [
-        'cancelProjectBtn',
-        'cancelMaterialBtn',
-        'cancelAssignmentBtn', 
-        'cancelLaborerBtn',
-        'cancelConfirmBtn'
-    ];
-    
-    cancelButtons.forEach(btnId => {
-        setupButton(btnId, closeAllModals);
-    });
-
-    // Action buttons
-    setupButton('confirmAssignmentBtn', confirmAssignment);
-    setupButton('confirmActionBtn', executeConfirmAction);
-}
-
-function setupDatePicker() {
-    const dateInput = document.getElementById('attendanceDate');
-    if (dateInput) {
-        dateInput.value = appState.currentDate;
-    }
-}
-
-// Dashboard Functions
+// Enhanced Dashboard Functions
 function loadDashboard() {
-    console.log('Loading dashboard...');
-    try {
-        updateDashboardStats();
-        renderProjectCostOverview();
-        setTimeout(() => initializeLaborCostChart(), 100);
-    } catch (error) {
-        console.error('Error loading dashboard:', error);
-    }
-}
-
-function updateDashboardStats() {
-    const totalProjects = appState.projects.length;
-    const totalLaborCost = calculateTotalLaborCost();
-    const averageProgress = appState.projects.length > 0 ? 
-        Math.round(appState.projects.reduce((sum, p) => sum + p.progress, 0) / appState.projects.length) : 0;
-
-    setElementText('totalProjects', totalProjects);
-    setElementText('totalLaborCost', `₹${totalLaborCost.toLocaleString()}`);
-    setElementText('averageProgress', `${averageProgress}%`);
-}
-
-function renderProjectCostOverview() {
-    const container = document.getElementById('projectCostOverview');
-    if (!container) return;
-    
-    container.innerHTML = appState.projects.map(project => {
-        const laborCost = calculateProjectLaborCost(project.id);
-        const materialCost = calculateProjectMaterialCost(project.id);
-        const totalCost = laborCost + materialCost;
-        const budgetUtilization = project.budget > 0 ? Math.round((totalCost / project.budget) * 100) : 0;
-
-        return `
-            <div class="project-cost-card">
-                <div class="project-cost-header">
-                    <h3 class="project-cost-title">${project.name}</h3>
-                    <div class="project-progress-badge">${project.progress}%</div>
-                </div>
-                <div class="cost-breakdown">
-                    <div class="cost-item">
-                        <h4 class="cost-amount">₹${laborCost.toLocaleString()}</h4>
-                        <p class="cost-label">Labor Costs</p>
-                    </div>
-                    <div class="cost-item">
-                        <h4 class="cost-amount">₹${materialCost.toLocaleString()}</h4>
-                        <p class="cost-label">Material Costs</p>
-                    </div>
-                </div>
-                <div class="progress-section">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                        <span>Budget Utilization</span>
-                        <span class="${budgetUtilization > 80 ? 'text-warning' : 'text-success'}">${budgetUtilization}%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${Math.min(budgetUtilization, 100)}%"></div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-function initializeLaborCostChart() {
-    const chartCanvas = document.getElementById('laborCostChart');
-    if (!chartCanvas) return;
-    
-    try {
-        if (charts.laborCostChart) {
-            charts.laborCostChart.destroy();
-        }
-        
-        const ctx = chartCanvas.getContext('2d');
-        
-        charts.laborCostChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                datasets: [{
-                    label: 'Weekly Labor Cost',
-                    data: [12000, 18000, 25000, 22000],
-                    borderColor: '#1FB8CD',
-                    backgroundColor: 'rgba(31, 184, 205, 0.1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return '₹' + value.toLocaleString();
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    } catch (error) {
-        console.error('Error initializing chart:', error);
-    }
-}
-
-// Projects Functions
-function loadProjects() {
-    console.log('Loading projects...');
-    renderProjectsList();
-}
-
-function filterProjects() {
-    const searchInput = document.getElementById('projectSearch');
-    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-    
-    if (searchTerm === '') {
-        renderProjectsList();
-        return;
-    }
-    
-    const filteredProjects = appState.projects.filter(project => 
-        project.name.toLowerCase().includes(searchTerm) ||
-        project.location.toLowerCase().includes(searchTerm) ||
-        project.status.toLowerCase().includes(searchTerm)
-    );
-    
-    renderProjectsList(filteredProjects);
-}
-
-function renderProjectsList(projectsToRender = null) {
-    const container = document.getElementById('projectsList');
-    if (!container) return;
-    
-    const projects = projectsToRender || appState.projects;
-    
-    if (projects.length === 0) {
-        container.innerHTML = '<div class="empty-state"><i class="fas fa-building"></i><p>No projects found</p></div>';
-        return;
-    }
-
-    container.innerHTML = projects.map(project => {
-        const laborCost = calculateProjectLaborCost(project.id);
-        const materialCost = calculateProjectMaterialCost(project.id);
-        const totalCost = laborCost + materialCost;
-
-        return `
-            <div class="project-card" id="project-${project.id}">
-                <div class="project-card-header" data-project-id="${project.id}">
-                    <div class="project-main-info">
-                        <h3>${project.name}</h3>
-                        <div class="project-meta">
-                            <span><i class="fas fa-map-marker-alt"></i> ${project.location}</span>
-                            <span><i class="fas fa-calendar"></i> ${formatDate(project.startDate)} - ${formatDate(project.endDate)}</span>
-                            <span class="status-badge status-badge--${project.status.toLowerCase().replace(' ', '-')}">${project.status}</span>
-                        </div>
-                    </div>
-                    <div class="project-actions">
-                        <button class="btn btn--sm btn--outline edit-project-btn" data-project-id="${project.id}" title="Edit Project">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn btn--sm btn--danger delete-project-btn" data-project-id="${project.id}" title="Delete Project">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                        <button class="btn btn--sm btn--outline expand-project-btn" data-project-id="${project.id}" title="Expand Project">
-                            <i class="fas fa-chevron-down expand-icon"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="project-card-content">
-                    <div class="project-details-grid">
-                        <div class="project-costs-section">
-                            <h4>Cost Overview</h4>
-                            <div class="costs-summary">
-                                <div class="cost-summary-item">
-                                    <h5>₹${laborCost.toLocaleString()}</h5>
-                                    <p>Labor Costs</p>
-                                </div>
-                                <div class="cost-summary-item">
-                                    <h5>₹${materialCost.toLocaleString()}</h5>
-                                    <p>Material Costs</p>
-                                </div>
-                                <div class="cost-summary-item">
-                                    <h5>₹${totalCost.toLocaleString()}</h5>
-                                    <p>Total Spent</p>
-                                </div>
-                                <div class="cost-summary-item">
-                                    <h5>₹${project.budget.toLocaleString()}</h5>
-                                    <p>Budget</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="project-materials-section">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                                <h4>Material Costs</h4>
-                                <button class="btn btn--sm btn--primary add-material-btn" data-project-id="${project.id}" title="Add Material Cost">
-                                    <i class="fas fa-plus"></i> Add Material
-                                </button>
-                            </div>
-                            <div class="materials-list">
-                                ${project.materialCosts.map(material => `
-                                    <div class="material-item">
-                                        <div class="material-info">
-                                            <h6>${material.description}</h6>
-                                            <p>${formatDate(material.date)} • ${material.category}</p>
-                                        </div>
-                                        <div class="material-actions">
-                                            <span class="material-amount">₹${material.amount.toLocaleString()}</span>
-                                            <button class="btn btn--sm btn--outline edit-material-btn" data-project-id="${project.id}" data-material-id="${material.id}" title="Edit Material">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn btn--sm btn--danger delete-material-btn" data-project-id="${project.id}" data-material-id="${material.id}" title="Delete Material">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                                ${project.materialCosts.length === 0 ? '<p class="text-center" style="color: var(--color-text-secondary); margin: 20px 0;">No material costs recorded yet.</p>' : ''}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    // Setup project action buttons
-    setupProjectActionButtons();
-}
-
-function setupProjectActionButtons() {
-    // Edit project buttons
-    document.querySelectorAll('.edit-project-btn').forEach(btn => {
-        btn.onclick = function(e) {
-            e.preventDefault();
-            const projectId = parseInt(this.getAttribute('data-project-id'));
-            openProjectModal(projectId);
-        };
-    });
-
-    // Delete project buttons
-    document.querySelectorAll('.delete-project-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const projectId = parseInt(this.dataset.projectId);
-            confirmDeleteProject(projectId);
-        });
-    });
-
-    // Expand project buttons
-    document.querySelectorAll('.expand-project-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const projectId = parseInt(this.dataset.projectId);
-            toggleProjectExpansion(projectId);
-        });
-    });
-
-    // Add material buttons
-    document.querySelectorAll('.add-material-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const projectId = parseInt(this.dataset.projectId);
-            openMaterialModal(projectId);
-        });
-    });
-
-    // Edit material buttons
-    document.querySelectorAll('.edit-material-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const projectId = parseInt(this.dataset.projectId);
-            const materialId = parseInt(this.dataset.materialId);
-            openMaterialModal(projectId, materialId);
-        });
-    });
-
-    // Delete material buttons
-    document.querySelectorAll('.delete-material-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const projectId = parseInt(this.dataset.projectId);
-            const materialId = parseInt(this.dataset.materialId);
-            confirmDeleteMaterial(projectId, materialId);
-        });
-    });
-}
-
-function toggleProjectExpansion(projectId) {
-    const card = document.getElementById(`project-${projectId}`);
-    if (card) {
-        card.classList.toggle('expanded');
-    }
-}
-
-// Attendance Functions
-function loadAttendance() {
-    console.log('Loading attendance...');
-    try {
-        const dateInput = document.getElementById('attendanceDate');
-        if (dateInput) {
-            dateInput.value = appState.currentDate;
-        }
-        renderAvailableLaborers();
-        renderProjectAssignments();
-        updateAttendanceSummary();
-    } catch (error) {
-        console.error('Error loading attendance:', error);
-    }
-}
-
-function renderAvailableLaborers() {
-    const container = document.getElementById('availableLaborers');
-    if (!container) return;
-    
-    const assignedLaborerIds = getAssignedLaborerIds(appState.currentDate);
-    const availableLaborers = appState.laborers.filter(laborer => 
-        laborer.status === 'Active' && !assignedLaborerIds.includes(laborer.id)
-    );
-
-    if (availableLaborers.length === 0) {
-        container.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>All laborers are assigned</p></div>';
-        return;
-    }
-
-    container.innerHTML = availableLaborers.map(laborer => `
-        <div class="laborer-item assign-laborer-btn" data-laborer-id="${laborer.id}">
-            <div class="laborer-name">${laborer.name}</div>
-            <div class="laborer-details">
-                <span>${laborer.role}</span>
-                <span>₹${laborer.dailyRate}/day</span>
-            </div>
-        </div>
-    `).join('');
-
-    // Setup click handlers for assignment
-    document.querySelectorAll('.assign-laborer-btn').forEach(btn => {
-        btn.onclick = function(e) {
-            e.preventDefault();
-            const laborerId = parseInt(this.getAttribute('data-laborer-id'));
-            openAssignmentModal(laborerId);
-        };
-    });
-}
-
-function renderProjectAssignments() {
-    const container = document.getElementById('projectAssignments');
-    if (!container) return;
-    
-    container.innerHTML = appState.projects.map(project => {
-        const assignedLaborers = getAssignedLaborersForProject(project.id, appState.currentDate);
-        const totalCost = assignedLaborers.reduce((sum, assignment) => {
-            const laborer = appState.laborers.find(l => l.id === assignment.laborerId);
-            if (laborer) {
-                const multiplier = appState.employmentTypes[assignment.employmentType].multiplier;
-                return sum + (laborer.dailyRate * multiplier);
-            }
-            return sum;
-        }, 0);
-        
-        return `
-            <div class="project-assignment">
-                <div class="assignment-header">
-                    <div class="assignment-title">${project.name}</div>
-                    <div class="assignment-cost">₹${Math.round(totalCost).toLocaleString()}</div>
-                </div>
-                <div class="assigned-laborers">
-                    ${assignedLaborers.map(assignment => {
-                        const laborer = appState.laborers.find(l => l.id === assignment.laborerId);
-                        if (!laborer) return '';
-                        const multiplier = appState.employmentTypes[assignment.employmentType].multiplier;
-                        const finalRate = laborer.dailyRate * multiplier;
-                        return `
-                            <div class="laborer-item assigned">
-                                <div class="laborer-name">${laborer.name}</div>
-                                <div class="laborer-details">
-                                    <span>${laborer.role}</span>
-                                    <div>
-                                        <span class="employment-type-badge">${appState.employmentTypes[assignment.employmentType].label}</span>
-                                        <span style="margin-left: 8px;">₹${Math.round(finalRate)}</span>
-                                    </div>
-                                </div>
-                                <button class="remove-btn unassign-laborer-btn" data-laborer-id="${assignment.laborerId}" title="Remove Assignment">×</button>
-                            </div>
-                        `;
-                    }).join('')}
-                    ${assignedLaborers.length === 0 ? '<p style="text-align: center; color: var(--color-text-secondary); margin: 20px 0;">No laborers assigned</p>' : ''}
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    // Setup unassign buttons
-    document.querySelectorAll('.unassign-laborer-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const laborerId = parseInt(this.dataset.laborerId);
-            unassignLaborer(laborerId);
-        });
-    });
-}
-
-function updateAttendanceSummary() {
-    const assignedLaborers = getAllAssignedLaborersForDate(appState.currentDate);
-    const totalAssigned = assignedLaborers.length;
-    
-    const dailyCost = assignedLaborers.reduce((sum, assignment) => {
-        const laborer = appState.laborers.find(l => l.id === assignment.laborerId);
-        if (laborer) {
-            const multiplier = appState.employmentTypes[assignment.employmentType].multiplier;
-            return sum + (laborer.dailyRate * multiplier);
-        }
-        return sum;
-    }, 0);
-
-    const employmentBreakdown = {};
-    assignedLaborers.forEach(assignment => {
-        const type = assignment.employmentType;
-        employmentBreakdown[type] = (employmentBreakdown[type] || 0) + 1;
-    });
-
-    const breakdownText = Object.entries(employmentBreakdown)
-        .map(([type, count]) => `${appState.employmentTypes[type].label}: ${count}`)
-        .join(', ') || 'None';
-    
-    setElementText('totalAssigned', totalAssigned);
-    setElementText('dailyCost', `₹${Math.round(dailyCost).toLocaleString()}`);
-    setElementText('employmentBreakdown', breakdownText);
-}
-
-function changeDate(days) {
-    const currentDate = new Date(appState.currentDate);
-    currentDate.setDate(currentDate.getDate() + days);
-    appState.currentDate = currentDate.toISOString().split('T')[0];
-    
-    const dateInput = document.getElementById('attendanceDate');
-    if (dateInput) {
-        dateInput.value = appState.currentDate;
-    }
-    
-    loadAttendance();
-}
-
-function copyPreviousDay() {
-    const currentDate = new Date(appState.currentDate);
-    const previousDate = new Date(currentDate);
-    previousDate.setDate(currentDate.getDate() - 1);
-    const previousDateStr = previousDate.toISOString().split('T')[0];
-
-    if (appState.attendance[previousDateStr]) {
-        appState.attendance[appState.currentDate] = JSON.parse(JSON.stringify(appState.attendance[previousDateStr]));
-        loadAttendance();
-        showSuccessMessage('Previous day attendance copied successfully!');
-    } else {
-        alert('No attendance data found for previous day');
-    }
-}
-
-// Labor Management Functions
-function loadLaborers() {
-    console.log('Loading laborers...');
-    renderLaborersEnhancedGrid();
-}
-
-function renderLaborersEnhancedGrid() {
-    const container = document.getElementById('laborersEnhancedGrid');
-    if (!container) return;
-    
-    const searchInput = document.getElementById('laborerSearch');
-    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-    
-    let filteredLaborers = appState.laborers;
-    if (searchTerm) {
-        filteredLaborers = appState.laborers.filter(laborer => 
-            laborer.name.toLowerCase().includes(searchTerm) ||
-            laborer.role.toLowerCase().includes(searchTerm)
-        );
-    }
-
-    if (filteredLaborers.length === 0) {
-        container.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>No laborers found</p></div>';
-        return;
-    }
-
-    container.innerHTML = filteredLaborers.map(laborer => {
-        const totalEarnings = calculateLaborerTotalEarnings(laborer.id);
-        const daysWorked = calculateLaborerDaysWorked(laborer.id);
-        const projects = getLaborerProjects(laborer.id);
-
-        return `
-            <div class="laborer-enhanced-card">
-                <div class="laborer-card-header">
-                    <div class="laborer-info">
-                        <h4>${laborer.name}</h4>
-                        <p class="laborer-role">${laborer.role}</p>
-                        <p style="color: var(--color-text-secondary); font-size: var(--font-size-sm); margin: 4px 0;">📞 ${laborer.phone}</p>
-                        <span class="status-badge status-badge--${laborer.status.toLowerCase()}">${laborer.status}</span>
-                    </div>
-                    <div class="project-actions">
-                        <button class="btn btn--sm btn--outline edit-laborer-btn" data-laborer-id="${laborer.id}" title="Edit Laborer">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn btn--sm btn--danger delete-laborer-btn" data-laborer-id="${laborer.id}" title="Delete Laborer">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="rate-breakdown">
-                    <h5>Employment Rate Breakdown</h5>
-                    <div class="rate-grid">
-                        ${Object.entries(appState.employmentTypes).map(([key, type]) => `
-                            <div class="rate-item">
-                                <span>${type.label}</span>
-                                <strong>₹${Math.round(laborer.dailyRate * type.multiplier)}</strong>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-
-                <div class="laborer-analytics" style="background-color: var(--color-bg-3); border-radius: var(--radius-base); padding: var(--space-16);">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: var(--space-12); text-align: center;">
-                        <div>
-                            <strong style="color: var(--color-text);">₹${totalEarnings.toLocaleString()}</strong>
-                            <p style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin: 2px 0 0 0;">Total Earned</p>
-                        </div>
-                        <div>
-                            <strong style="color: var(--color-text);">${daysWorked}</strong>
-                            <p style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin: 2px 0 0 0;">Days Worked</p>
-                        </div>
-                        <div>
-                            <strong style="color: var(--color-text);">${projects.length}</strong>
-                            <p style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin: 2px 0 0 0;">Projects</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    // Setup laborer action buttons
-    document.querySelectorAll('.edit-laborer-btn').forEach(btn => {
-        btn.onclick = function(e) {
-            e.preventDefault();
-            const laborerId = parseInt(this.getAttribute('data-laborer-id'));
-            openLaborerModal(laborerId);
-        };
-    });
-
-    document.querySelectorAll('.delete-laborer-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const laborerId = parseInt(this.dataset.laborerId);
-            confirmDeleteLaborer(laborerId);
-        });
-    });
-}
-
-// Modal Functions - COMPLETELY FIXED
-function openProjectModal(projectId = null) {
-    console.log('Opening project modal, projectId:', projectId);
-    
-    const modal = document.getElementById('projectModal');
-    const form = document.getElementById('projectForm');
-    const title = document.getElementById('projectModalTitle');
-    
-    if (!modal || !form || !title) {
-        console.error('Project modal elements not found');
-        return;
-    }
-    
-    // Reset form
-    form.reset();
-    clearFormErrors();
-    
-    if (projectId) {
-        // Edit mode: fill form with project data
-        const project = appState.projects.find(p => p.id === projectId);
-        if (project) {
-            document.getElementById('projectId').value = project.id;
-            document.getElementById('projectName').value = project.name;
-            document.getElementById('projectLocation').value = project.location;
-            document.getElementById('projectStartDate').value = project.startDate;
-            document.getElementById('projectEndDate').value = project.endDate;
-            document.getElementById('projectBudget').value = project.budget;
-            document.getElementById('projectProgress').value = project.progress;
-            document.getElementById('projectStatus').value = project.status;
-            title.textContent = 'Edit Project';
-        }
-    } else {
-        title.textContent = 'Add Project';
-    }
-    showModal(modal);
-}
-
-function openMaterialModal(projectId, materialId = null) {
-    console.log('Opening material modal, projectId:', projectId, 'materialId:', materialId);
-    
-    const modal = document.getElementById('materialModal');
-    const form = document.getElementById('materialForm');
-    const title = document.getElementById('materialModalTitle');
-    
-    if (!modal || !form || !title) {
-        console.error('Material modal elements not found');
-        return;
-    }
-    
-    // Reset form
-    form.reset();
-    clearFormErrors();
-    
-    document.getElementById('materialProjectId').value = projectId;
-    document.getElementById('materialDate').value = appState.currentDate;
-    
-    if (materialId) {
-        const project = appState.projects.find(p => p.id === projectId);
-        const material = project?.materialCosts.find(m => m.id === materialId);
-        if (material) {
-            title.textContent = 'Edit Material Cost';
-            document.getElementById('materialId').value = material.id;
-            document.getElementById('materialDate').value = material.date;
-            document.getElementById('materialDescription').value = material.description;
-            document.getElementById('materialCategory').value = material.category;
-            document.getElementById('materialAmount').value = material.amount;
-        }
-    } else {
-        title.textContent = 'Add Material Cost';
-    }
-    
-    showModal(modal);
-}
-
-function openLaborerModal(laborerId = null) {
-    console.log('Opening laborer modal, laborerId:', laborerId);
-    
-    const modal = document.getElementById('laborerModal');
-    const form = document.getElementById('laborerForm');
-    const title = document.getElementById('laborerModalTitle');
-    
-    if (!modal || !form || !title) {
-        console.error('Laborer modal elements not found');
-        return;
-    }
-    
-    // Reset form
-    form.reset();
-    clearFormErrors();
-    
-    if (laborerId) {
-        // Edit mode: fill form with laborer data
-        const laborer = appState.laborers.find(l => l.id === laborerId);
-        if (laborer) {
-            document.getElementById('laborerId').value = laborer.id;
-            document.getElementById('laborerName').value = laborer.name;
-            document.getElementById('laborerRole').value = laborer.role;
-            document.getElementById('laborerRate').value = laborer.dailyRate;
-            document.getElementById('laborerPhone').value = laborer.phone;
-            document.getElementById('laborerStatus').value = laborer.status;
-            title.textContent = 'Edit Laborer';
-        }
-    } else {
-        title.textContent = 'Add Laborer';
-    }
-    showModal(modal);
-}
-
-function openAssignmentModal(laborerId) {
-    console.log('Opening assignment modal, laborerId:', laborerId);
-    
-    const laborer = appState.laborers.find(l => l.id === laborerId);
-    if (!laborer) return;
-    
-    const modal = document.getElementById('assignmentModal');
-    
-    // Populate project dropdown
-    const projectSelect = document.getElementById('assignProjectId');
-    if (projectSelect) {
-        projectSelect.innerHTML = '<option value="">Select Project</option>' +
-            appState.projects.map(project => `<option value="${project.id}">${project.name}</option>`).join('');
-    }
-
-    document.getElementById('assignLaborerId').value = laborerId;
-    document.getElementById('employmentType').value = 'normal';
-    setElementText('baseRate', `₹${laborer.dailyRate}`);
-    setElementText('finalRate', `₹${laborer.dailyRate}`);
-
-    // Update final rate when employment type changes
-    const employmentSelect = document.getElementById('employmentType');
-    if (employmentSelect) {
-        employmentSelect.onchange = function() {
-            const multiplier = appState.employmentTypes[this.value].multiplier;
-            const finalRate = laborer.dailyRate * multiplier;
-            setElementText('finalRate', `₹${Math.round(finalRate)}`);
-        };
-    }
-
-    showModal(modal);
-}
-
-function showModal(modal) {
-    if (modal) {
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    }
-}
-
-function closeAllModals() {
-    document.querySelectorAll('.modal').forEach(modal => {
-        modal.classList.add('hidden');
-    });
-    document.body.style.overflow = '';
-}
-
-function clearFormErrors() {
-    document.querySelectorAll('.error-message').forEach(el => {
-        el.textContent = '';
-    });
-    document.querySelectorAll('.form-control.error').forEach(el => {
-        el.classList.remove('error');
-    });
-}
-
-// Assignment Functions
-function confirmAssignment() {
-    const laborerId = parseInt(document.getElementById('assignLaborerId').value);
-    const projectId = parseInt(document.getElementById('assignProjectId').value);
-    const employmentType = document.getElementById('employmentType').value;
-
-    if (!projectId) {
-        alert('Please select a project');
-        return;
-    }
-
-    assignLaborerToProject(laborerId, projectId, employmentType);
-    closeAllModals();
-    loadAttendance();
-    updateDashboardStats();
-    showSuccessMessage('Laborer assigned successfully!');
-}
-
-function assignLaborerToProject(laborerId, projectId, employmentType) {
-    const date = appState.currentDate;
-    
-    if (!appState.attendance[date]) {
-        appState.attendance[date] = {};
-    }
-    
-    if (!appState.attendance[date][projectId.toString()]) {
-        appState.attendance[date][projectId.toString()] = [];
-    }
-    
-    // Remove laborer from other projects on this date
-    Object.keys(appState.attendance[date]).forEach(pId => {
-        appState.attendance[date][pId] = appState.attendance[date][pId].filter(assignment => assignment.laborerId !== laborerId);
-    });
-    
-    // Add laborer to new project with employment type
-    appState.attendance[date][projectId.toString()].push({
-        laborerId: laborerId,
-        employmentType: employmentType
-    });
-}
-
-function unassignLaborer(laborerId) {
-    const date = appState.currentDate;
-    
-    if (appState.attendance[date]) {
-        Object.keys(appState.attendance[date]).forEach(projectId => {
-            appState.attendance[date][projectId] = appState.attendance[date][projectId].filter(assignment => assignment.laborerId !== laborerId);
-        });
-    }
-    
-    loadAttendance();
-    updateDashboardStats();
-    showSuccessMessage('Laborer unassigned successfully!');
-}
-
-// Form Validation
-function validateProjectForm() {
-    const requiredFields = [
-        { id: 'projectName', message: 'Project name is required' },
-        { id: 'projectLocation', message: 'Location is required' },
-        { id: 'projectStartDate', message: 'Start date is required' },
-        { id: 'projectEndDate', message: 'End date is required' },
-        { id: 'projectBudget', message: 'Budget is required' }
-    ];
-    
-    return validateFields(requiredFields) && validateProjectDates() && validateProjectProgress();
-}
-
-function validateMaterialForm() {
-    const requiredFields = [
-        { id: 'materialDate', message: 'Date is required' },
-        { id: 'materialDescription', message: 'Description is required' },
-        { id: 'materialCategory', message: 'Category is required' },
-        { id: 'materialAmount', message: 'Amount is required' }
-    ];
-    
-    return validateFields(requiredFields);
-}
-
-function validateLaborerForm() {
-    const requiredFields = [
-        { id: 'laborerName', message: 'Name is required' },
-        { id: 'laborerRole', message: 'Role is required' },
-        { id: 'laborerRate', message: 'Daily rate is required' },
-        { id: 'laborerPhone', message: 'Phone number is required' }
-    ];
-    
-    return validateFields(requiredFields) && validatePhone();
-}
-
-function validateFields(fields) {
-    let isValid = true;
-    
-    fields.forEach(field => {
-        const input = document.getElementById(field.id);
-        const errorEl = document.getElementById(field.id + 'Error');
-        
-        if (input && errorEl) {
-            errorEl.textContent = '';
-            input.classList.remove('error');
-            
-            if (!input.value || input.value.trim() === '') {
-                isValid = false;
-                errorEl.textContent = field.message;
-                input.classList.add('error');
-            }
-        }
-    });
-    
-    return isValid;
-}
-
-function validateProjectDates() {
-    const startDateInput = document.getElementById('projectStartDate');
-    const endDateInput = document.getElementById('projectEndDate');
-    const errorEl = document.getElementById('projectEndDateError');
-    
-    if (startDateInput && endDateInput && startDateInput.value && endDateInput.value) {
-        if (startDateInput.value >= endDateInput.value) {
-            if (errorEl) errorEl.textContent = 'End date must be after start date';
-            endDateInput.classList.add('error');
-            return false;
-        }
-    }
-    
-    return true;
-}
-
-function validateProjectProgress() {
-    const progressInput = document.getElementById('projectProgress');
-    const errorEl = document.getElementById('projectProgressError');
-    
-    if (progressInput && progressInput.value) {
-        const progress = parseInt(progressInput.value);
-        if (progress < 0 || progress > 100) {
-            if (errorEl) errorEl.textContent = 'Progress must be between 0 and 100';
-            progressInput.classList.add('error');
-            return false;
-        }
-    }
-    
-    return true;
-}
-
-function validatePhone() {
-    const phoneInput = document.getElementById('laborerPhone');
-    const errorEl = document.getElementById('laborerPhoneError');
-    
-    if (phoneInput && phoneInput.value) {
-        const phonePattern = /^[0-9]{10}$/;
-        if (!phonePattern.test(phoneInput.value)) {
-            if (errorEl) errorEl.textContent = 'Phone must be 10 digits';
-            phoneInput.classList.add('error');
-            return false;
-        }
-    }
-    
-    return true;
-}
-
-// Save Functions
-function saveProject() {
-    const projectId = document.getElementById('projectId').value;
-    const isEdit = !!projectId;
-    
-    const project = {
-        id: isEdit ? parseInt(projectId) : appState.nextProjectId++,
-        name: document.getElementById('projectName').value.trim(),
-        location: document.getElementById('projectLocation').value.trim(),
-        startDate: document.getElementById('projectStartDate').value,
-        endDate: document.getElementById('projectEndDate').value,
-        budget: parseInt(document.getElementById('projectBudget').value),
-        status: document.getElementById('projectStatus').value,
-        progress: parseInt(document.getElementById('projectProgress').value) || 0,
-        materialCosts: []
-    };
-
-    const existingIndex = appState.projects.findIndex(p => p.id === project.id);
-    if (existingIndex !== -1) {
-        project.materialCosts = appState.projects[existingIndex].materialCosts;
-        appState.projects[existingIndex] = project;
-    } else {
-        appState.projects.push(project);
-    }
-
-    closeAllModals();
-    loadProjects();
-    updateDashboardStats();
-    renderProjectCostOverview();
-    
-    showSuccessMessage(isEdit ? 'Project updated successfully!' : 'Project added successfully!');
-}
-
-function saveMaterial() {
-    const projectId = parseInt(document.getElementById('materialProjectId').value);
-    const materialId = document.getElementById('materialId').value;
-    const isEdit = !!materialId;
-    
-    const material = {
-        id: isEdit ? parseInt(materialId) : appState.nextMaterialId++,
-        date: document.getElementById('materialDate').value,
-        description: document.getElementById('materialDescription').value.trim(),
-        category: document.getElementById('materialCategory').value,
-        amount: parseInt(document.getElementById('materialAmount').value)
-    };
-
-    const project = appState.projects.find(p => p.id === projectId);
-    if (project) {
-        if (isEdit) {
-            const materialIndex = project.materialCosts.findIndex(m => m.id === material.id);
-            if (materialIndex !== -1) {
-                project.materialCosts[materialIndex] = material;
-            }
-        } else {
-            project.materialCosts.push(material);
-        }
-    }
-
-    closeAllModals();
-    loadProjects();
-    updateDashboardStats();
-    renderProjectCostOverview();
-    
-    showSuccessMessage(isEdit ? 'Material cost updated successfully!' : 'Material cost added successfully!');
-}
-
-function saveLaborer() {
-    const laborerId = document.getElementById('laborerId').value;
-    const isEdit = !!laborerId;
-    
-    const laborer = {
-        id: isEdit ? parseInt(laborerId) : appState.nextLaborerId++,
-        name: document.getElementById('laborerName').value.trim(),
-        role: document.getElementById('laborerRole').value,
-        dailyRate: parseInt(document.getElementById('laborerRate').value),
-        phone: document.getElementById('laborerPhone').value.trim(),
-        status: document.getElementById('laborerStatus').value
-    };
-
-    const existingIndex = appState.laborers.findIndex(l => l.id === laborer.id);
-    if (existingIndex !== -1) {
-        appState.laborers[existingIndex] = laborer;
-    } else {
-        appState.laborers.push(laborer);
-    }
-
-    closeAllModals();
-    loadLaborers();
-    updateDashboardStats();
-    
-    showSuccessMessage(isEdit ? 'Laborer updated successfully!' : 'Laborer added successfully!');
-}
-
-// Delete Functions
-function confirmDeleteProject(id) {
-    const project = appState.projects.find(p => p.id === id);
-    if (project) {
-        showConfirmModal(`Are you sure you want to delete "${project.name}"?`, () => deleteProject(id));
-    }
-}
-
-function confirmDeleteMaterial(projectId, materialId) {
-    const project = appState.projects.find(p => p.id === projectId);
-    const material = project?.materialCosts.find(m => m.id === materialId);
-    if (material) {
-        showConfirmModal(`Are you sure you want to delete "${material.description}"?`, () => deleteMaterial(projectId, materialId));
-    }
-}
-
-function confirmDeleteLaborer(id) {
-    const laborer = appState.laborers.find(l => l.id === id);
-    if (laborer) {
-        showConfirmModal(`Are you sure you want to delete ${laborer.name}?`, () => deleteLaborer(id));
-    }
-}
-
-function showConfirmModal(message, callback) {
-    const modal = document.getElementById('confirmModal');
-    const messageEl = document.getElementById('confirmMessage');
-    
-    if (modal && messageEl) {
-        messageEl.textContent = message;
-        confirmCallback = callback;
-        showModal(modal);
-    }
-}
-
-function executeConfirmAction() {
-    if (confirmCallback) {
-        confirmCallback();
-        confirmCallback = null;
-    }
-    closeAllModals();
-}
-
-function deleteProject(id) {
-    appState.projects = appState.projects.filter(p => p.id !== id);
-    
-    // Remove from attendance records
-    Object.keys(appState.attendance).forEach(date => {
-        delete appState.attendance[date][id.toString()];
-    });
-    
-    loadProjects();
-    updateDashboardStats();
-    renderProjectCostOverview();
-    showSuccessMessage('Project deleted successfully!');
-}
-
-function deleteMaterial(projectId, materialId) {
-    const project = appState.projects.find(p => p.id === projectId);
-    if (project) {
-        project.materialCosts = project.materialCosts.filter(m => m.id !== materialId);
-        loadProjects();
-        updateDashboardStats();
-        renderProjectCostOverview();
-        showSuccessMessage('Material cost deleted successfully!');
-    }
-}
-
-function deleteLaborer(id) {
-    appState.laborers = appState.laborers.filter(l => l.id !== id);
-    
-    // Remove from attendance records
-    Object.keys(appState.attendance).forEach(date => {
-        Object.keys(appState.attendance[date]).forEach(projectId => {
-            appState.attendance[date][projectId] = appState.attendance[date][projectId].filter(assignment => assignment.laborerId !== id);
-        });
-    });
-    
-    loadLaborers();
-    updateDashboardStats();
-    showSuccessMessage('Laborer deleted successfully!');
-}
-
-// Utility Functions
-function setElementText(id, text) {
-    const element = document.getElementById(id);
-    if (element) {
-        element.textContent = text;
-    }
-}
-
-function formatDate(dateString) {
-    try {
-        return new Date(dateString).toLocaleDateString('en-IN', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric'
-        });
-    } catch (error) {
-        return dateString;
-    }
-}
-
-function showSuccessMessage(message) {
-    const successDiv = document.createElement('div');
-    successDiv.className = 'success-message';
-    successDiv.textContent = message;
-    successDiv.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 10000;
-        max-width: 300px;
-        animation: fadeIn 0.3s ease;
-    `;
-    
-    document.body.appendChild(successDiv);
-    
+    updateDashboardMetrics();
+    renderProjectCostCards();
     setTimeout(() => {
-        successDiv.style.animation = 'fadeOut 0.3s ease';
-        setTimeout(() => {
-            if (document.body.contains(successDiv)) {
-                document.body.removeChild(successDiv);
-            }
-        }, 300);
-    }, 3000);
+        initializeCostTrendsChart();
+    }, 100);
 }
 
-// Cost Calculation Functions
+function updateDashboardMetrics() {
+    const totalProjects = appState.projects.length;
+    const activeLaborers = appState.laborers.filter(l => l.status === 'Active').length;
+    const totalLaborCost = calculateTotalLaborCost();
+    const avgProgress = Math.round(appState.projects.reduce((sum, p) => sum + p.progress, 0) / appState.projects.length);
+
+    document.getElementById('totalProjects').textContent = totalProjects;
+    document.getElementById('totalLaborers').textContent = activeLaborers;
+    document.getElementById('totalLaborCost').textContent = formatCurrency(totalLaborCost);
+    document.getElementById('avgProgress').textContent = `${avgProgress}%`;
+}
+
 function calculateTotalLaborCost() {
     let totalCost = 0;
-    Object.values(appState.attendance).forEach(dayAttendance => {
+    Object.entries(appState.attendance).forEach(([date, dayAttendance]) => {
         Object.values(dayAttendance).forEach(assignments => {
             assignments.forEach(assignment => {
                 const laborer = appState.laborers.find(l => l.id === assignment.laborerId);
                 if (laborer) {
-                    const multiplier = appState.employmentTypes[assignment.employmentType].multiplier;
+                    const employmentType = appState.employmentTypes.find(et => et.id === assignment.employmentType);
+                    const multiplier = employmentType ? employmentType.multiplier : 1.0;
                     totalCost += laborer.dailyRate * multiplier;
                 }
             });
         });
     });
-    return Math.round(totalCost);
+    return totalCost;
+}
+
+function renderProjectCostCards() {
+    const container = document.getElementById('projectCostCards');
+    
+    container.innerHTML = appState.projects.map(project => {
+        const laborCost = calculateProjectLaborCost(project.id);
+        const materialCost = calculateProjectMaterialCost(project.id);
+        const totalCost = laborCost + materialCost;
+        const budgetVariance = ((totalCost - project.budget) / project.budget) * 100;
+        const varianceClass = budgetVariance > 0 ? 'negative' : 'positive';
+
+        return `
+            <div class="project-cost-card" onclick="showProjectDetails(${project.id})">
+                <div class="cost-card-header">
+                    <h4 class="cost-card-title">${project.name}</h4>
+                    <div class="cost-variance ${varianceClass}">
+                        ${budgetVariance > 0 ? '+' : ''}${budgetVariance.toFixed(1)}%
+                    </div>
+                </div>
+                <div class="cost-breakdown">
+                    <div class="cost-item">
+                        <span class="cost-label">Labor Cost:</span>
+                        <span class="cost-value">${formatCurrency(laborCost)}</span>
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">Material Cost:</span>
+                        <span class="cost-value">${formatCurrency(materialCost)}</span>
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">Budget:</span>
+                        <span class="cost-value">${formatCurrency(project.budget)}</span>
+                    </div>
+                    <div class="cost-item cost-total">
+                        <span class="cost-label">Total Spent:</span>
+                        <span class="cost-value">${formatCurrency(totalCost)}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
 function calculateProjectLaborCost(projectId) {
-    let projectCost = 0;
+    let totalCost = 0;
     Object.values(appState.attendance).forEach(dayAttendance => {
-        const projectAttendance = dayAttendance[projectId.toString()] || [];
-        projectAttendance.forEach(assignment => {
+        const projectAssignments = dayAttendance[projectId.toString()] || [];
+        projectAssignments.forEach(assignment => {
             const laborer = appState.laborers.find(l => l.id === assignment.laborerId);
             if (laborer) {
-                const multiplier = appState.employmentTypes[assignment.employmentType].multiplier;
-                projectCost += laborer.dailyRate * multiplier;
+                const employmentType = appState.employmentTypes.find(et => et.id === assignment.employmentType);
+                const multiplier = employmentType ? employmentType.multiplier : 1.0;
+                totalCost += laborer.dailyRate * multiplier;
             }
         });
     });
-    return Math.round(projectCost);
+    return totalCost;
 }
 
 function calculateProjectMaterialCost(projectId) {
     const project = appState.projects.find(p => p.id === projectId);
-    return project ? project.materialCosts.reduce((sum, cost) => sum + cost.amount, 0) : 0;
+    return project ? project.materialCosts.reduce((sum, material) => sum + material.cost, 0) : 0;
 }
 
-function calculateLaborerTotalEarnings(laborerId) {
-    let totalEarnings = 0;
-    Object.values(appState.attendance).forEach(dayAttendance => {
-        Object.values(dayAttendance).forEach(assignments => {
-            const assignment = assignments.find(a => a.laborerId === laborerId);
-            if (assignment) {
-                const laborer = appState.laborers.find(l => l.id === laborerId);
-                if (laborer) {
-                    const multiplier = appState.employmentTypes[assignment.employmentType].multiplier;
-                    totalEarnings += laborer.dailyRate * multiplier;
+function initializeCostTrendsChart() {
+    if (charts.costTrendsChart) charts.costTrendsChart.destroy();
+
+    const ctx = document.getElementById('costTrendsChart').getContext('2d');
+    const chartData = generateCostTrendsData();
+    
+    charts.costTrendsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: chartData.labels,
+            datasets: chartData.datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '₹' + value.toLocaleString();
+                        }
+                    }
                 }
             }
-        });
+        }
     });
-    return Math.round(totalEarnings);
 }
 
-function calculateLaborerDaysWorked(laborerId) {
-    let daysWorked = 0;
-    Object.values(appState.attendance).forEach(dayAttendance => {
-        Object.values(dayAttendance).forEach(assignments => {
-            if (assignments.some(a => a.laborerId === laborerId)) {
-                daysWorked++;
-                return;
-            }
-        });
-    });
-    return daysWorked;
+function generateCostTrendsData() {
+    const colors = ['#1FB8CD', '#FFC185', '#B4413C'];
+    const labels = ['Jul 2024', 'Aug 2024', 'Sep 2024', 'Oct 2024'];
+    
+    const datasets = appState.projects.map((project, index) => ({
+        label: project.name,
+        data: [
+            Math.random() * 500000 + 200000,
+            Math.random() * 600000 + 300000,
+            Math.random() * 700000 + 400000,
+            Math.random() * 800000 + 500000
+        ],
+        borderColor: colors[index % colors.length],
+        backgroundColor: colors[index % colors.length] + '20',
+        tension: 0.4
+    }));
+
+    return { labels, datasets };
 }
 
-function getLaborerProjects(laborerId) {
-    const projectIds = new Set();
-    Object.values(appState.attendance).forEach(dayAttendance => {
-        Object.keys(dayAttendance).forEach(projectId => {
-            const assignments = dayAttendance[projectId];
-            if (assignments.some(a => a.laborerId === laborerId)) {
-                projectIds.add(parseInt(projectId));
+// Enhanced Labor Management Functions
+function loadLaborers() {
+    renderLaborersTable();
+}
+
+function initializeFilters() {
+    // Labor filters
+    const roleFilter = document.getElementById('laborerRoleFilter');
+    const skillFilter = document.getElementById('laborerSkillFilter');
+    const projectFilter = document.getElementById('projectStatusFilter');
+    const availableFilter = document.getElementById('availableRoleFilter');
+
+    if (roleFilter) roleFilter.addEventListener('change', renderLaborersTable);
+    if (skillFilter) skillFilter.addEventListener('change', renderLaborersTable);
+    if (projectFilter) projectFilter.addEventListener('change', renderProjectsGrid);
+    if (availableFilter) availableFilter.addEventListener('change', renderAvailableLaborers);
+}
+
+function renderLaborersTable() {
+    const tbody = document.getElementById('laborersTableBody');
+    const searchTerm = document.getElementById('laborerSearch').value.toLowerCase();
+    const roleFilter = document.getElementById('laborerRoleFilter').value;
+    const skillFilter = document.getElementById('laborerSkillFilter').value;
+    
+    const filteredLaborers = appState.laborers.filter(laborer => 
+        (laborer.name.toLowerCase().includes(searchTerm) ||
+         laborer.role.toLowerCase().includes(searchTerm)) &&
+        (roleFilter === '' || laborer.role === roleFilter) &&
+        (skillFilter === '' || laborer.skillLevel === skillFilter)
+    );
+
+    tbody.innerHTML = filteredLaborers.map(laborer => `
+        <tr>
+            <td>
+                <input type="checkbox" class="laborer-checkbox" data-laborer-id="${laborer.id}">
+            </td>
+            <td>${laborer.name}</td>
+            <td>${laborer.role}</td>
+            <td>
+                <span class="status-badge status-badge--${laborer.skillLevel.toLowerCase()}">${laborer.skillLevel}</span>
+            </td>
+            <td>${formatCurrency(laborer.dailyRate)}</td>
+            <td>${laborer.totalDaysWorked}</td>
+            <td>${formatCurrency(laborer.totalEarnings)}</td>
+            <td>${laborer.phone}</td>
+            <td><span class="status-badge status-badge--${laborer.status.toLowerCase()}">${laborer.status}</span></td>
+            <td>
+                <button class="btn btn--sm btn--outline" onclick="editLaborer(${laborer.id})" title="Edit">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn--sm btn--danger" onclick="confirmDeleteLaborer(${laborer.id})" title="Delete">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function toggleSelectAll() {
+    const selectAll = document.getElementById('selectAll');
+    const checkboxes = document.querySelectorAll('.laborer-checkbox');
+    checkboxes.forEach(cb => cb.checked = selectAll.checked);
+}
+
+function bulkUpdateRates() {
+    const selected = getSelectedLaborers();
+    if (selected.length === 0) {
+        showToast('Please select laborers to update', 'warning');
+        return;
+    }
+    
+    const newRate = prompt(`Update daily rate for ${selected.length} laborers:`);
+    if (newRate && !isNaN(newRate) && newRate > 0) {
+        selected.forEach(laborerId => {
+            const laborer = appState.laborers.find(l => l.id === laborerId);
+            if (laborer) {
+                laborer.dailyRate = parseInt(newRate);
             }
         });
+        renderLaborersTable();
+        showToast(`Updated rates for ${selected.length} laborers`, 'success');
+    }
+}
+
+function getSelectedLaborers() {
+    const checkboxes = document.querySelectorAll('.laborer-checkbox:checked');
+    return Array.from(checkboxes).map(cb => parseInt(cb.dataset.laborerId));
+}
+
+// Enhanced Project Management Functions
+function loadProjects() {
+    renderProjectsGrid();
+}
+
+function renderProjectsGrid() {
+    const grid = document.getElementById('projectsGrid');
+    const searchTerm = document.getElementById('projectSearch') ? document.getElementById('projectSearch').value.toLowerCase() : '';
+    const statusFilter = document.getElementById('projectStatusFilter') ? document.getElementById('projectStatusFilter').value : '';
+    
+    const filteredProjects = appState.projects.filter(project => 
+        (project.name.toLowerCase().includes(searchTerm) ||
+         project.location.toLowerCase().includes(searchTerm)) &&
+        (statusFilter === '' || project.status === statusFilter)
+    );
+
+    grid.innerHTML = filteredProjects.map(project => {
+        const laborCost = calculateProjectLaborCost(project.id);
+        const materialCost = calculateProjectMaterialCost(project.id);
+        const totalCost = laborCost + materialCost;
+
+        return `
+            <div class="project-card" onclick="showProjectDetails(${project.id})">
+                <div class="project-header">
+                    <h3 class="project-title">${project.name}</h3>
+                    <div class="project-actions" onclick="event.stopPropagation()">
+                        <button class="btn btn--sm btn--outline" onclick="editProject(${project.id})" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn--sm btn--danger" onclick="confirmDeleteProject(${project.id})" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="project-info">
+                    <p><i class="fas fa-map-marker-alt"></i> ${project.location}</p>
+                    <p><i class="fas fa-calendar"></i> ${formatDate(project.startDate)} - ${formatDate(project.endDate)}</p>
+                    <p><i class="fas fa-rupee-sign"></i> Budget: ${formatCurrency(project.budget)}</p>
+                    <p><span class="status-badge status-badge--${project.status.toLowerCase().replace(' ', '-')}">${project.status}</span></p>
+                </div>
+                <div class="project-summary">
+                    <div class="summary-item">
+                        <span class="summary-value">${formatCurrency(laborCost)}</span>
+                        <div class="summary-label">Labor Cost</div>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-value">${formatCurrency(materialCost)}</span>
+                        <div class="summary-label">Material Cost</div>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-value">${formatCurrency(totalCost)}</span>
+                        <div class="summary-label">Total Spent</div>
+                    </div>
+                </div>
+                <div class="project-progress">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span>Progress</span>
+                        <span>${project.progress}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${project.progress}%"></div>
+                    </div>
+                </div>
+                <button class="expand-btn" onclick="event.stopPropagation(); showProjectDetails(${project.id})">
+                    <i class="fas fa-expand"></i> View Details
+                </button>
+            </div>
+        `;
+    }).join('');
+}
+
+function showProjectDetails(projectId) {
+    const project = appState.projects.find(p => p.id === projectId);
+    if (!project) return;
+
+    const modal = document.getElementById('projectDetailsModal');
+    const title = document.getElementById('projectDetailsTitle');
+    const content = document.getElementById('projectDetailsContent');
+
+    title.textContent = project.name;
+
+    const laborCost = calculateProjectLaborCost(project.id);
+    const materialCost = calculateProjectMaterialCost(project.id);
+    const totalCost = laborCost + materialCost;
+    const budgetVariance = totalCost - project.budget;
+
+    content.innerHTML = `
+        <div class="project-details-tabs">
+            <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
+            <button class="tab-btn" onclick="switchTab('materials')">Materials</button>
+            <button class="tab-btn" onclick="switchTab('milestones')">Milestones</button>
+            <button class="tab-btn" onclick="switchTab('costs')">Cost Analysis</button>
+        </div>
+
+        <div id="overview-tab" class="tab-content active">
+            <div class="project-summary">
+                <div class="summary-item">
+                    <span class="summary-value">${formatCurrency(project.budget)}</span>
+                    <div class="summary-label">Budget</div>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-value">${formatCurrency(totalCost)}</span>
+                    <div class="summary-label">Spent</div>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-value ${budgetVariance >= 0 ? 'text-error' : 'text-success'}">${formatCurrency(Math.abs(budgetVariance))}</span>
+                    <div class="summary-label">${budgetVariance >= 0 ? 'Over Budget' : 'Under Budget'}</div>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-value">${project.progress}%</span>
+                    <div class="summary-label">Progress</div>
+                </div>
+            </div>
+            <div class="project-info">
+                <p><strong>Location:</strong> ${project.location}</p>
+                <p><strong>Duration:</strong> ${formatDate(project.startDate)} - ${formatDate(project.endDate)}</p>
+                <p><strong>Status:</strong> <span class="status-badge status-badge--${project.status.toLowerCase().replace(' ', '-')}">${project.status}</span></p>
+            </div>
+        </div>
+
+        <div id="materials-tab" class="tab-content">
+            <div class="material-costs-section">
+                <div class="section-header">
+                    <h4>Material Costs</h4>
+                    <button class="btn btn--primary btn--sm" onclick="openMaterialModal(${project.id})">
+                        <i class="fas fa-plus"></i> Add Material
+                    </button>
+                </div>
+                <div class="materials-list">
+                    ${project.materialCosts.map(material => `
+                        <div class="material-item">
+                            <div class="material-info">
+                                <strong>${material.item}</strong> - ${material.quantity}
+                                <br>
+                                <small>${formatDate(material.date)} • ${material.supplier || 'No supplier'}</small>
+                            </div>
+                            <div class="material-actions">
+                                <span class="font-semibold">${formatCurrency(material.cost)}</span>
+                                <button class="btn btn--sm btn--outline" onclick="editMaterial(${project.id}, ${material.id})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn--sm btn--danger" onclick="deleteMaterial(${project.id}, ${material.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="cost-total" style="margin-top: 16px;">
+                    <strong>Total Material Cost: ${formatCurrency(materialCost)}</strong>
+                </div>
+            </div>
+        </div>
+
+        <div id="milestones-tab" class="tab-content">
+            <div class="materials-list">
+                ${project.milestones.map(milestone => `
+                    <div class="material-item">
+                        <div class="material-info">
+                            <strong>${milestone.name}</strong>
+                            <br>
+                            <small>Target: ${formatDate(milestone.targetDate)} ${milestone.actualDate ? `• Actual: ${formatDate(milestone.actualDate)}` : ''}</small>
+                        </div>
+                        <div class="material-actions">
+                            <span class="status-badge status-badge--${milestone.status.toLowerCase().replace(' ', '-')}">${milestone.status}</span>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+
+        <div id="costs-tab" class="tab-content">
+            <div class="cost-breakdown">
+                <div class="cost-item">
+                    <span class="cost-label">Labor Cost:</span>
+                    <span class="cost-value">${formatCurrency(laborCost)}</span>
+                </div>
+                <div class="cost-item">
+                    <span class="cost-label">Material Cost:</span>
+                    <span class="cost-value">${formatCurrency(materialCost)}</span>
+                </div>
+                <div class="cost-item">
+                    <span class="cost-label">Budget Allocated:</span>
+                    <span class="cost-value">${formatCurrency(project.budget)}</span>
+                </div>
+                <div class="cost-item cost-total">
+                    <span class="cost-label">Total Spent:</span>
+                    <span class="cost-value">${formatCurrency(totalCost)}</span>
+                </div>
+                <div class="cost-item">
+                    <span class="cost-label">Budget Variance:</span>
+                    <span class="cost-value ${budgetVariance >= 0 ? 'text-error' : 'text-success'}">
+                        ${budgetVariance >= 0 ? '+' : ''}${formatCurrency(budgetVariance)}
+                    </span>
+                </div>
+            </div>
+        </div>
+    `;
+
+    modal.classList.remove('hidden');
+}
+
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    
+    document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+    document.getElementById(`${tabName}-tab`).classList.add('active');
+}
+
+function closeProjectDetailsModal() {
+    document.getElementById('projectDetailsModal').classList.add('hidden');
+}
+
+// Material Management Functions
+function openMaterialModal(projectId, materialId = null) {
+    const modal = document.getElementById('materialModal');
+    const form = document.getElementById('materialForm');
+    const title = document.getElementById('materialModalTitle');
+    
+    form.reset();
+    document.getElementById('materialProjectId').value = projectId;
+    document.getElementById('materialDate').value = appState.currentDate;
+    
+    if (materialId) {
+        const project = appState.projects.find(p => p.id === projectId);
+        const material = project.materialCosts.find(m => m.id === materialId);
+        if (material) {
+            title.textContent = 'Edit Material Cost';
+            document.getElementById('materialId').value = material.id;
+            document.getElementById('materialItem').value = material.item;
+            document.getElementById('materialQuantity').value = material.quantity;
+            document.getElementById('materialCost').value = material.cost;
+            document.getElementById('materialDate').value = material.date;
+            document.getElementById('materialSupplier').value = material.supplier || '';
+        }
+    } else {
+        title.textContent = 'Add Material Cost';
+    }
+    
+    modal.classList.remove('hidden');
+}
+
+function closeMaterialModal() {
+    document.getElementById('materialModal').classList.add('hidden');
+}
+
+function editMaterial(projectId, materialId) {
+    openMaterialModal(projectId, materialId);
+}
+
+function deleteMaterial(projectId, materialId) {
+    const project = appState.projects.find(p => p.id === projectId);
+    const material = project.materialCosts.find(m => m.id === materialId);
+    
+    showConfirmModal(
+        `Delete material "${material.item}"?`,
+        () => {
+            project.materialCosts = project.materialCosts.filter(m => m.id !== materialId);
+            showProjectDetails(projectId);
+            showToast('Material deleted successfully', 'success');
+        },
+        `Cost: ${formatCurrency(material.cost)}`
+    );
+}
+
+// Enhanced Attendance Management Functions
+function initializeDatePicker() {
+    const dateInput = document.getElementById('attendanceDate');
+    if (dateInput) {
+        dateInput.value = appState.currentDate;
+        dateInput.addEventListener('change', function() {
+            appState.currentDate = this.value;
+            loadAttendance();
+        });
+    }
+}
+
+function loadAttendance() {
+    document.getElementById('attendanceDate').value = appState.currentDate;
+    renderAvailableLaborers();
+    renderProjectAssignments();
+    updateAttendanceSummary();
+    renderEmploymentLegend();
+}
+
+function renderAvailableLaborers() {
+    const container = document.getElementById('availableLaborers');
+    const roleFilter = document.getElementById('availableRoleFilter') ? document.getElementById('availableRoleFilter').value : '';
+    const assignedLaborerIds = getAssignedLaborerIds(appState.currentDate);
+    
+    const availableLaborers = appState.laborers.filter(laborer => 
+        laborer.status === 'Active' && 
+        !assignedLaborerIds.includes(laborer.id) &&
+        (roleFilter === '' || laborer.role === roleFilter)
+    );
+
+    if (availableLaborers.length === 0) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>No available laborers</p></div>';
+        return;
+    }
+
+    container.innerHTML = availableLaborers.map(laborer => `
+        <div class="laborer-item" draggable="true" data-laborer-id="${laborer.id}">
+            <div class="laborer-name">${laborer.name}</div>
+            <div class="laborer-details">
+                <span>${laborer.role} - ${formatCurrency(laborer.dailyRate)}/day</span>
+                <span class="status-badge status-badge--${laborer.skillLevel.toLowerCase()}">${laborer.skillLevel}</span>
+            </div>
+        </div>
+    `).join('');
+
+    // Add drag event listeners
+    container.querySelectorAll('.laborer-item').forEach(item => {
+        item.addEventListener('dragstart', handleDragStart);
+        item.addEventListener('click', function() {
+            selectLaborer(parseInt(this.dataset.laborerId));
+        });
     });
-    return Array.from(projectIds);
+}
+
+function renderProjectAssignments() {
+    const container = document.getElementById('projectAssignments');
+    
+    container.innerHTML = appState.projects.map(project => {
+        const assignedLaborers = getAssignedLaborersForProject(project.id, appState.currentDate);
+        const totalCost = assignedLaborers.reduce((sum, assignment) => {
+            const employmentType = appState.employmentTypes.find(et => et.id === assignment.employmentType);
+            const multiplier = employmentType ? employmentType.multiplier : 1.0;
+            return sum + (assignment.laborer.dailyRate * multiplier);
+        }, 0);
+        
+        return `
+            <div class="project-assignment drop-zone" data-project-id="${project.id}">
+                <div class="assignment-header">
+                    <div class="assignment-title">${project.name}</div>
+                    <div class="assignment-cost">${formatCurrency(totalCost)}</div>
+                </div>
+                <div class="assigned-laborers">
+                    ${assignedLaborers.map(assignment => `
+                        <div class="laborer-item" data-laborer-id="${assignment.laborer.id}" onclick="unassignLaborer(${assignment.laborer.id})">
+                            <div class="laborer-name">${assignment.laborer.name}</div>
+                            <div class="laborer-details">
+                                <span>${assignment.laborer.role} - ${formatCurrency(assignment.laborer.dailyRate * assignment.multiplier)}/day</span>
+                                <div class="employment-type-indicator-small" style="background-color: ${assignment.color}" title="${assignment.employmentTypeName}"></div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    // Add drop event listeners
+    container.querySelectorAll('.drop-zone').forEach(zone => {
+        zone.addEventListener('dragover', handleDragOver);
+        zone.addEventListener('drop', handleDrop);
+        zone.addEventListener('dragleave', handleDragLeave);
+    });
 }
 
 function getAssignedLaborerIds(date) {
@@ -1587,30 +832,618 @@ function getAssignedLaborerIds(date) {
     return assigned;
 }
 
-function getAllAssignedLaborersForDate(date) {
-    const attendance = appState.attendance[date];
-    if (!attendance) return [];
-    
-    const assigned = [];
-    Object.values(attendance).forEach(assignments => {
-        assigned.push(...assignments);
-    });
-    return assigned;
-}
-
 function getAssignedLaborersForProject(projectId, date) {
     const attendance = appState.attendance[date];
     if (!attendance || !attendance[projectId.toString()]) return [];
     
-    return attendance[projectId.toString()];
+    const assignments = attendance[projectId.toString()];
+    return assignments.map(assignment => {
+        const laborer = appState.laborers.find(l => l.id === assignment.laborerId);
+        const employmentType = appState.employmentTypes.find(et => et.id === assignment.employmentType);
+        return {
+            laborer,
+            employmentType: assignment.employmentType,
+            employmentTypeName: employmentType ? employmentType.name : 'Normal',
+            multiplier: employmentType ? employmentType.multiplier : 1.0,
+            color: employmentType ? employmentType.color : '#10B981'
+        };
+    }).filter(a => a.laborer);
 }
 
-// Add CSS for animations
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes fadeOut {
-        from { opacity: 1; transform: translateY(0); }
-        to { opacity: 0; transform: translateY(-10px); }
+function selectLaborer(laborerId) {
+    document.querySelectorAll('.laborer-item').forEach(item => {
+        item.classList.remove('selected');
+    });
+    document.querySelector(`[data-laborer-id="${laborerId}"]`).classList.add('selected');
+    
+    // Show employment type selection
+    appState.selectedLaborerId = laborerId;
+    showEmploymentTypeModal();
+}
+
+function showEmploymentTypeModal() {
+    const modal = document.getElementById('employmentTypeModal');
+    const container = document.getElementById('employmentTypesList');
+    
+    container.innerHTML = appState.employmentTypes.map(type => `
+        <div class="employment-type-option" onclick="selectEmploymentType('${type.id}')">
+            <div class="employment-type-indicator" style="background-color: ${type.color}"></div>
+            <div class="employment-type-info">
+                <div class="employment-type-name">${type.name}</div>
+                <div class="employment-type-rate">${type.multiplier}x rate</div>
+            </div>
+        </div>
+    `).join('');
+    
+    modal.classList.remove('hidden');
+}
+
+function selectEmploymentType(employmentTypeId) {
+    appState.pendingAssignment = {
+        laborerId: appState.selectedLaborerId,
+        employmentType: employmentTypeId
+    };
+    closeEmploymentTypeModal();
+    
+    // Highlight drop zones
+    document.querySelectorAll('.drop-zone').forEach(zone => {
+        zone.style.border = '2px dashed var(--color-primary)';
+        zone.style.backgroundColor = 'var(--color-bg-1)';
+    });
+    
+    showToast('Select a project to assign the laborer', 'info');
+}
+
+function closeEmploymentTypeModal() {
+    document.getElementById('employmentTypeModal').classList.add('hidden');
+}
+
+function renderEmploymentLegend() {
+    const container = document.getElementById('employmentLegend');
+    container.innerHTML = appState.employmentTypes.map(type => `
+        <div class="employment-type-badge">
+            <div class="employment-type-indicator" style="background-color: ${type.color}"></div>
+            <span>${type.name}</span>
+        </div>
+    `).join('');
+}
+
+function handleDragStart(e) {
+    e.dataTransfer.setData('text/plain', e.target.dataset.laborerId);
+    e.target.classList.add('dragging');
+    appState.draggingLaborerId = parseInt(e.target.dataset.laborerId);
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    e.currentTarget.classList.add('drag-over');
+}
+
+function handleDragLeave(e) {
+    e.currentTarget.classList.remove('drag-over');
+}
+
+function handleDrop(e) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+    
+    const laborerId = parseInt(e.dataTransfer.getData('text/plain'));
+    const projectId = parseInt(e.currentTarget.dataset.projectId);
+    
+    if (appState.pendingAssignment && appState.pendingAssignment.laborerId === laborerId) {
+        // Use pending assignment with employment type
+        assignLaborerToProject(laborerId, projectId, appState.pendingAssignment.employmentType);
+        appState.pendingAssignment = null;
+        
+        // Reset drop zone highlighting
+        document.querySelectorAll('.drop-zone').forEach(zone => {
+            zone.style.border = '';
+            zone.style.backgroundColor = '';
+        });
+    } else {
+        // Show employment type selection for drag & drop
+        appState.selectedLaborerId = laborerId;
+        appState.targetProjectId = projectId;
+        showEmploymentTypeModal();
     }
-`;
-document.head.appendChild(style);
+}
+
+function assignLaborerToProject(laborerId, projectId, employmentType = 'normal') {
+    const date = appState.currentDate;
+    
+    // Initialize attendance for date if doesn't exist
+    if (!appState.attendance[date]) {
+        appState.attendance[date] = {};
+    }
+    
+    // Initialize project attendance if doesn't exist
+    if (!appState.attendance[date][projectId.toString()]) {
+        appState.attendance[date][projectId.toString()] = [];
+    }
+    
+    // Remove laborer from other projects on this date
+    Object.keys(appState.attendance[date]).forEach(pId => {
+        appState.attendance[date][pId] = appState.attendance[date][pId].filter(assignment => 
+            assignment.laborerId !== laborerId
+        );
+    });
+    
+    // Add laborer to new project with employment type
+    appState.attendance[date][projectId.toString()].push({
+        laborerId: laborerId,
+        employmentType: employmentType
+    });
+    
+    // Update laborer stats
+    const laborer = appState.laborers.find(l => l.id === laborerId);
+    const employmentMultiplier = appState.employmentTypes.find(et => et.id === employmentType)?.multiplier || 1.0;
+    laborer.totalDaysWorked += 1;
+    laborer.totalEarnings += laborer.dailyRate * employmentMultiplier;
+    
+    loadAttendance();
+    showToast(`${laborer.name} assigned with ${employmentType} shift`, 'success');
+}
+
+function unassignLaborer(laborerId) {
+    const date = appState.currentDate;
+    
+    if (appState.attendance[date]) {
+        Object.keys(appState.attendance[date]).forEach(projectId => {
+            appState.attendance[date][projectId] = appState.attendance[date][projectId].filter(assignment => 
+                assignment.laborerId !== laborerId
+            );
+        });
+    }
+    
+    const laborer = appState.laborers.find(l => l.id === laborerId);
+    showToast(`${laborer.name} unassigned`, 'info');
+    loadAttendance();
+}
+
+function updateAttendanceSummary() {
+    const assignedLaborerIds = getAssignedLaborerIds(appState.currentDate);
+    const totalAssigned = assignedLaborerIds.length;
+    const activeProjects = Object.keys(appState.attendance[appState.currentDate] || {}).filter(projectId => 
+        appState.attendance[appState.currentDate][projectId].length > 0
+    ).length;
+    
+    const dailyCost = calculateDailyCost(appState.currentDate);
+    
+    document.getElementById('totalAssigned').textContent = totalAssigned;
+    document.getElementById('assignmentBreakdown').textContent = `Across ${activeProjects} projects`;
+    document.getElementById('dailyCost').textContent = formatCurrency(dailyCost);
+    
+    // Calculate employment type breakdown
+    const employmentBreakdown = getEmploymentTypeBreakdown(appState.currentDate);
+    document.getElementById('costBreakdown').textContent = `Normal: ${employmentBreakdown.normal}, OT: ${employmentBreakdown.overtime}, Double: ${employmentBreakdown.double}`;
+}
+
+function calculateDailyCost(date) {
+    const attendance = appState.attendance[date];
+    if (!attendance) return 0;
+    
+    let totalCost = 0;
+    Object.values(attendance).forEach(assignments => {
+        assignments.forEach(assignment => {
+            const laborer = appState.laborers.find(l => l.id === assignment.laborerId);
+            const employmentType = appState.employmentTypes.find(et => et.id === assignment.employmentType);
+            if (laborer) {
+                const multiplier = employmentType ? employmentType.multiplier : 1.0;
+                totalCost += laborer.dailyRate * multiplier;
+            }
+        });
+    });
+    return totalCost;
+}
+
+function getEmploymentTypeBreakdown(date) {
+    const attendance = appState.attendance[date];
+    if (!attendance) return {normal: 0, overtime: 0, double: 0, night: 0, holiday: 0};
+    
+    const breakdown = {normal: 0, overtime: 0, double: 0, night: 0, holiday: 0};
+    Object.values(attendance).forEach(assignments => {
+        assignments.forEach(assignment => {
+            breakdown[assignment.employmentType] = (breakdown[assignment.employmentType] || 0) + 1;
+        });
+    });
+    return breakdown;
+}
+
+function changeDate(days) {
+    const currentDate = new Date(appState.currentDate);
+    currentDate.setDate(currentDate.getDate() + days);
+    appState.currentDate = currentDate.toISOString().split('T')[0];
+    loadAttendance();
+}
+
+function goToToday() {
+    appState.currentDate = new Date().toISOString().split('T')[0];
+    loadAttendance();
+}
+
+// Enhanced Form Handling
+function initializeSearch() {
+    const laborerSearch = document.getElementById('laborerSearch');
+    const projectSearch = document.getElementById('projectSearch');
+    
+    if (laborerSearch) laborerSearch.addEventListener('input', renderLaborersTable);
+    if (projectSearch) projectSearch.addEventListener('input', renderProjectsGrid);
+}
+
+function initializeForms() {
+    // Laborer form
+    const laborerForm = document.getElementById('laborerForm');
+    if (laborerForm) {
+        laborerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveLaborer();
+        });
+    }
+
+    // Project form
+    const projectForm = document.getElementById('projectForm');
+    if (projectForm) {
+        projectForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveProject();
+        });
+    }
+
+    // Material form
+    const materialForm = document.getElementById('materialForm');
+    if (materialForm) {
+        materialForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveMaterial();
+        });
+    }
+}
+
+function updateProgressValue(value) {
+    document.getElementById('progressValue').textContent = value;
+}
+
+function openLaborerModal(laborerId = null) {
+    const modal = document.getElementById('laborerModal');
+    const form = document.getElementById('laborerForm');
+    const title = document.getElementById('laborerModalTitle');
+    
+    form.reset();
+    
+    if (laborerId) {
+        const laborer = appState.laborers.find(l => l.id === laborerId);
+        if (laborer) {
+            title.textContent = 'Edit Laborer';
+            document.getElementById('laborerId').value = laborer.id;
+            document.getElementById('laborerName').value = laborer.name;
+            document.getElementById('laborerRole').value = laborer.role;
+            document.getElementById('laborerSkillLevel').value = laborer.skillLevel;
+            document.getElementById('laborerRate').value = laborer.dailyRate;
+            document.getElementById('laborerPhone').value = laborer.phone;
+            document.getElementById('laborerStatus').value = laborer.status;
+        }
+    } else {
+        title.textContent = 'Add Laborer';
+        document.getElementById('laborerStatus').value = 'Active';
+        document.getElementById('laborerSkillLevel').value = 'Helper';
+    }
+    
+    modal.classList.remove('hidden');
+}
+
+function closeLaborerModal() {
+    document.getElementById('laborerModal').classList.add('hidden');
+}
+
+function saveLaborer() {
+    const laborer = {
+        id: document.getElementById('laborerId').value ? 
+            parseInt(document.getElementById('laborerId').value) : 
+            appState.nextLaborerId++,
+        name: document.getElementById('laborerName').value,
+        role: document.getElementById('laborerRole').value,
+        skillLevel: document.getElementById('laborerSkillLevel').value,
+        dailyRate: parseInt(document.getElementById('laborerRate').value),
+        phone: document.getElementById('laborerPhone').value,
+        status: document.getElementById('laborerStatus').value,
+        totalDaysWorked: 0,
+        totalEarnings: 0
+    };
+
+    const existingIndex = appState.laborers.findIndex(l => l.id === laborer.id);
+    if (existingIndex !== -1) {
+        // Preserve existing stats when editing
+        laborer.totalDaysWorked = appState.laborers[existingIndex].totalDaysWorked;
+        laborer.totalEarnings = appState.laborers[existingIndex].totalEarnings;
+        appState.laborers[existingIndex] = laborer;
+        showToast('Laborer updated successfully', 'success');
+    } else {
+        appState.laborers.push(laborer);
+        showToast('Laborer added successfully', 'success');
+    }
+
+    closeLaborerModal();
+    renderLaborersTable();
+    updateDashboardMetrics();
+}
+
+function editLaborer(id) {
+    openLaborerModal(id);
+}
+
+function confirmDeleteLaborer(id) {
+    const laborer = appState.laborers.find(l => l.id === id);
+    if (laborer) {
+        showConfirmModal(
+            `Delete laborer "${laborer.name}"?`,
+            () => deleteLaborer(id),
+            `This will remove them from all attendance records.`
+        );
+    }
+}
+
+function deleteLaborer(id) {
+    const laborer = appState.laborers.find(l => l.id === id);
+    appState.laborers = appState.laborers.filter(l => l.id !== id);
+    
+    // Remove from attendance records
+    Object.keys(appState.attendance).forEach(date => {
+        Object.keys(appState.attendance[date]).forEach(projectId => {
+            appState.attendance[date][projectId] = appState.attendance[date][projectId].filter(assignment => assignment.laborerId !== id);
+        });
+    });
+    
+    renderLaborersTable();
+    updateDashboardMetrics();
+    showToast(`${laborer.name} deleted successfully`, 'success');
+}
+
+function openProjectModal(projectId = null) {
+    const modal = document.getElementById('projectModal');
+    const form = document.getElementById('projectForm');
+    const title = document.getElementById('projectModalTitle');
+    
+    form.reset();
+    
+    if (projectId) {
+        const project = appState.projects.find(p => p.id === projectId);
+        if (project) {
+            title.textContent = 'Edit Project';
+            document.getElementById('projectId').value = project.id;
+            document.getElementById('projectName').value = project.name;
+            document.getElementById('projectLocation').value = project.location;
+            document.getElementById('projectStartDate').value = project.startDate;
+            document.getElementById('projectEndDate').value = project.endDate;
+            document.getElementById('projectBudget').value = project.budget;
+            document.getElementById('projectStatus').value = project.status;
+            document.getElementById('projectProgress').value = project.progress;
+            document.getElementById('progressValue').textContent = project.progress;
+        }
+    } else {
+        title.textContent = 'Add Project';
+        document.getElementById('projectStatus').value = 'Not Started';
+        document.getElementById('projectProgress').value = 0;
+        document.getElementById('progressValue').textContent = '0';
+    }
+    
+    modal.classList.remove('hidden');
+}
+
+function closeProjectModal() {
+    document.getElementById('projectModal').classList.add('hidden');
+}
+
+function saveProject() {
+    const project = {
+        id: document.getElementById('projectId').value ? 
+            parseInt(document.getElementById('projectId').value) : 
+            appState.nextProjectId++,
+        name: document.getElementById('projectName').value,
+        location: document.getElementById('projectLocation').value,
+        startDate: document.getElementById('projectStartDate').value,
+        endDate: document.getElementById('projectEndDate').value,
+        budget: parseInt(document.getElementById('projectBudget').value),
+        status: document.getElementById('projectStatus').value,
+        progress: parseInt(document.getElementById('projectProgress').value),
+        materialCosts: [],
+        milestones: []
+    };
+
+    const existingIndex = appState.projects.findIndex(p => p.id === project.id);
+    if (existingIndex !== -1) {
+        // Preserve existing material costs and milestones
+        project.materialCosts = appState.projects[existingIndex].materialCosts;
+        project.milestones = appState.projects[existingIndex].milestones;
+        appState.projects[existingIndex] = project;
+        showToast('Project updated successfully', 'success');
+    } else {
+        appState.projects.push(project);
+        showToast('Project added successfully', 'success');
+    }
+
+    closeProjectModal();
+    renderProjectsGrid();
+    renderProjectCostCards();
+    updateDashboardMetrics();
+}
+
+function editProject(id) {
+    openProjectModal(id);
+}
+
+function confirmDeleteProject(id) {
+    const project = appState.projects.find(p => p.id === id);
+    if (project) {
+        showConfirmModal(
+            `Delete project "${project.name}"?`,
+            () => deleteProject(id),
+            `This will remove all associated attendance and material records.`
+        );
+    }
+}
+
+function deleteProject(id) {
+    const project = appState.projects.find(p => p.id === id);
+    appState.projects = appState.projects.filter(p => p.id !== id);
+    
+    // Remove from attendance records
+    Object.keys(appState.attendance).forEach(date => {
+        delete appState.attendance[date][id.toString()];
+    });
+    
+    renderProjectsGrid();
+    renderProjectCostCards();
+    updateDashboardMetrics();
+    showToast(`${project.name} deleted successfully`, 'success');
+}
+
+function saveMaterial() {
+    const projectId = parseInt(document.getElementById('materialProjectId').value);
+    const materialId = document.getElementById('materialId').value;
+    
+    const material = {
+        id: materialId ? parseInt(materialId) : appState.nextMaterialId++,
+        item: document.getElementById('materialItem').value,
+        quantity: document.getElementById('materialQuantity').value,
+        cost: parseInt(document.getElementById('materialCost').value),
+        date: document.getElementById('materialDate').value,
+        supplier: document.getElementById('materialSupplier').value
+    };
+
+    const project = appState.projects.find(p => p.id === projectId);
+    if (!project.materialCosts) project.materialCosts = [];
+    
+    const existingIndex = project.materialCosts.findIndex(m => m.id === material.id);
+    if (existingIndex !== -1) {
+        project.materialCosts[existingIndex] = material;
+        showToast('Material updated successfully', 'success');
+    } else {
+        project.materialCosts.push(material);
+        showToast('Material added successfully', 'success');
+    }
+
+    closeMaterialModal();
+    showProjectDetails(projectId);
+    renderProjectCostCards();
+}
+
+// Enhanced Modal Functions
+function showConfirmModal(message, onConfirm, details = '') {
+    document.getElementById('confirmMessage').textContent = message;
+    document.getElementById('confirmDetails').textContent = details;
+    document.getElementById('confirmModal').classList.remove('hidden');
+    
+    window.currentConfirmAction = onConfirm;
+}
+
+function closeConfirmModal() {
+    document.getElementById('confirmModal').classList.add('hidden');
+    window.currentConfirmAction = null;
+}
+
+function confirmAction() {
+    if (window.currentConfirmAction) {
+        window.currentConfirmAction();
+        window.currentConfirmAction = null;
+    }
+    closeConfirmModal();
+}
+
+// Toast Notification System
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-${getToastIcon(type)}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    container.appendChild(toast);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+
+function getToastIcon(type) {
+    const icons = {
+        success: 'check-circle',
+        error: 'exclamation-circle',
+        warning: 'exclamation-triangle',
+        info: 'info-circle'
+    };
+    return icons[type] || 'info-circle';
+}
+
+// Export Functions
+function exportDashboardData() {
+    const data = {
+        projects: appState.projects.map(project => ({
+            name: project.name,
+            budget: project.budget,
+            laborCost: calculateProjectLaborCost(project.id),
+            materialCost: calculateProjectMaterialCost(project.id),
+            progress: project.progress,
+            status: project.status
+        }))
+    };
+    
+    downloadJSON(data, 'dashboard-report.json');
+    showToast('Dashboard data exported', 'success');
+}
+
+function exportProjectsData() {
+    const data = {
+        projects: appState.projects,
+        totalProjects: appState.projects.length,
+        exportDate: new Date().toISOString()
+    };
+    
+    downloadJSON(data, 'projects-data.json');
+    showToast('Projects data exported', 'success');
+}
+
+function downloadJSON(data, filename) {
+    const dataStr = JSON.stringify(data, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    
+    const exportFileDefaultName = filename;
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+}
+
+// Utility Functions
+function formatCurrency(amount) {
+    return '₹' + amount.toLocaleString('en-IN');
+}
+
+function formatDate(dateString) {
+    return new Date(dateString).toLocaleDateString('en-IN', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+    });
+}
+
+// Close modals when clicking outside
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal')) {
+        e.target.classList.add('hidden');
+    }
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.classList.add('hidden');
+        });
+    }
+});
