@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Management System</title>
+    <title>Promanager</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -20,14 +20,14 @@
                 <li><a href="#dashboard" class="nav-link active" data-page="dashboard">
                     <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a></li>
+                <li><a href="#laborers" class="nav-link" data-page="laborers">
+                    <i class="fas fa-users"></i> Labor List
+                </a></li>
                 <li><a href="#projects" class="nav-link" data-page="projects">
                     <i class="fas fa-building"></i> Projects
                 </a></li>
                 <li><a href="#attendance" class="nav-link" data-page="attendance">
                     <i class="fas fa-calendar-check"></i> Attendance
-                </a></li>
-                <li><a href="#laborers" class="nav-link" data-page="laborers">
-                    <i class="fas fa-users"></i> Labor Management
                 </a></li>
             </ul>
         </nav>
@@ -39,77 +39,179 @@
                 <div class="page-header">
                     <div>
                         <h1>Dashboard Overview</h1>
-                        <p class="text-secondary">Comprehensive project cost management and tracking</p>
+                        <p class="text-secondary">Comprehensive project cost management and analytics</p>
                     </div>
-                    <button class="btn btn--primary" onclick="refreshDashboard()">
-                        <i class="fas fa-sync-alt"></i> Refresh
-                    </button>
-                </div>
-
-                <!-- Summary Stats -->
-                <div class="stats-row">
-                    <div class="stat-card">
-                        <div class="stat-icon bg-primary">
-                            <i class="fas fa-building"></i>
-                        </div>
-                        <div class="stat-content">
-                            <h3 id="totalProjects">0</h3>
-                            <p>Active Projects</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon bg-success">
-                            <i class="fas fa-rupee-sign"></i>
-                        </div>
-                        <div class="stat-content">
-                            <h3 id="totalLaborCost">₹0</h3>
-                            <p>Total Labor Cost</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon bg-warning">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="stat-content">
-                            <h3 id="averageProgress">0%</h3>
-                            <p>Average Progress</p>
-                        </div>
+                    <div class="dashboard-actions">
+                        <button class="btn btn--outline btn--sm" onclick="exportDashboardData()">
+                            <i class="fas fa-download"></i> Export Report
+                        </button>
                     </div>
                 </div>
 
-                <!-- Project Cost Overview Cards -->
-                <div class="section-header">
-                    <h2>Project Cost Overview</h2>
-                </div>
-                <div class="project-cost-grid" id="projectCostOverview">
-                </div>
+                <div class="dashboard-grid">
+                    <!-- Key Metrics Row -->
+                    <div class="metrics-row">
+                        <div class="metric-card">
+                            <div class="metric-icon bg-primary">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div class="metric-content">
+                                <h3 id="totalProjects">0</h3>
+                                <p>Active Projects</p>
+                                <span class="metric-trend" id="projectsTrend">+0 this month</span>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon bg-success">
+                                <i class="fas fa-rupee-sign"></i>
+                            </div>
+                            <div class="metric-content">
+                                <h3 id="totalLaborCost">₹0</h3>
+                                <p>Total Labor Cost</p>
+                                <span class="metric-trend" id="laborCostTrend">Last 30 days</span>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon bg-warning">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="metric-content">
+                                <h3 id="totalLaborers">0</h3>
+                                <p>Active Laborers</p>
+                                <span class="metric-trend" id="laborersTrend">Available today</span>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon bg-info">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="metric-content">
+                                <h3 id="avgProgress">0%</h3>
+                                <p>Average Progress</p>
+                                <span class="metric-trend" id="progressTrend">Across all projects</span>
+                            </div>
+                        </div>
+                    </div>
 
-                <!-- Labor Cost Trends -->
-                <div class="chart-container">
-                    <h4>Weekly Labor Cost Trends</h4>
-                    <div class="chart-wrapper" style="height: 300px; position: relative;">
-                        <canvas id="laborCostChart"></canvas>
+                    <!-- Individual Project Cost Breakdown -->
+                    <div class="project-costs-section">
+                        <div class="section-header">
+                            <h2>Project Cost Analysis</h2>
+                            <div class="cost-filters">
+                                <select id="costTimeframe" class="form-control">
+                                    <option value="all">All Time</option>
+                                    <option value="month">This Month</option>
+                                    <option value="week">This Week</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="project-cost-cards" id="projectCostCards">
+                        </div>
+                    </div>
+
+                    <!-- Cost Trends Chart -->
+                    <div class="charts-section">
+                        <div class="chart-container">
+                            <h4>Monthly Cost Trends</h4>
+                            <div class="chart-wrapper" style="height: 350px; position: relative;">
+                                <canvas id="costTrendsChart"></canvas>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Enhanced Projects Page -->
+            <!-- Enhanced Labor List Page -->
+            <div id="laborers" class="page">
+                <div class="page-header">
+                    <div>
+                        <h1>Labor Management</h1>
+                        <p class="text-secondary">Manage workforce with detailed profiles and analytics</p>
+                    </div>
+                    <button class="btn btn--primary" onclick="openLaborerModal()">
+                        <i class="fas fa-plus"></i> Add Laborer
+                    </button>
+                </div>
+
+                <div class="labor-controls">
+                    <div class="search-section">
+                        <input type="text" id="laborerSearch" placeholder="Search laborers..." class="form-control">
+                        <select id="laborerRoleFilter" class="form-control">
+                            <option value="">All Roles</option>
+                            <option value="Mason">Mason</option>
+                            <option value="Helper">Helper</option>
+                            <option value="Electrician">Electrician</option>
+                            <option value="Plumber">Plumber</option>
+                            <option value="Carpenter">Carpenter</option>
+                            <option value="Painter">Painter</option>
+                        </select>
+                        <select id="laborerSkillFilter" class="form-control">
+                            <option value="">All Skill Levels</option>
+                            <option value="Helper">Helper</option>
+                            <option value="Skilled">Skilled</option>
+                            <option value="Expert">Expert</option>
+                        </select>
+                    </div>
+                    <div class="bulk-actions">
+                        <button class="btn btn--outline" onclick="bulkUpdateRates()">
+                            <i class="fas fa-edit"></i> Bulk Rate Update
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                                </th>
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>Skill Level</th>
+                                <th>Daily Rate</th>
+                                <th>Total Days</th>
+                                <th>Total Earnings</th>
+                                <th>Phone</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="laborersTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Enhanced Interactive Projects Page -->
             <div id="projects" class="page">
                 <div class="page-header">
                     <div>
                         <h1>Project Management</h1>
-                        <p class="text-secondary">Manage projects, track costs, and monitor progress</p>
+                        <p class="text-secondary">Interactive project details with comprehensive cost tracking</p>
                     </div>
-                    <button class="btn btn--primary" id="addProjectBtn">
-                        <i class="fas fa-plus"></i> Add Project
-                    </button>
+                    <div class="project-actions">
+                        <button class="btn btn--outline" onclick="exportProjectsData()">
+                            <i class="fas fa-file-export"></i> Export
+                        </button>
+                        <button class="btn btn--primary" onclick="openProjectModal()">
+                            <i class="fas fa-plus"></i> Add Project
+                        </button>
+                    </div>
                 </div>
 
-                <div class="search-bar">
+                <div class="project-filters">
+                    <select id="projectStatusFilter" class="form-control">
+                        <option value="">All Statuses</option>
+                        <option value="Not Started">Not Started</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                        <option value="On Hold">On Hold</option>
+                    </select>
                     <input type="text" id="projectSearch" placeholder="Search projects..." class="form-control">
                 </div>
 
-                <div class="projects-list" id="projectsList">
+                <div class="projects-grid" id="projectsGrid">
                 </div>
             </div>
 
@@ -118,18 +220,18 @@
                 <div class="page-header">
                     <div>
                         <h1>Attendance Management</h1>
-                        <p class="text-secondary">Manage daily attendance with employment type tracking</p>
+                        <p class="text-secondary">Manage labor assignments with employment types</p>
                     </div>
                     <div class="date-controls">
-                        <button class="btn btn--outline" id="prevDateBtn">
+                        <button class="btn btn--outline" onclick="changeDate(-1)">
                             <i class="fas fa-chevron-left"></i>
                         </button>
                         <input type="date" id="attendanceDate" class="form-control">
-                        <button class="btn btn--outline" id="nextDateBtn">
+                        <button class="btn btn--outline" onclick="changeDate(1)">
                             <i class="fas fa-chevron-right"></i>
                         </button>
-                        <button class="btn btn--secondary" id="copyPrevDayBtn">
-                            <i class="fas fa-copy"></i> Copy Previous Day
+                        <button class="btn btn--primary" onclick="goToToday()">
+                            <i class="fas fa-calendar-day"></i> Today
                         </button>
                     </div>
                 </div>
@@ -137,18 +239,33 @@
                 <div class="attendance-summary">
                     <div class="summary-card">
                         <h4>Total Assigned: <span id="totalAssigned">0</span></h4>
+                        <p class="summary-detail" id="assignmentBreakdown">Across 0 projects</p>
                     </div>
                     <div class="summary-card">
                         <h4>Daily Cost: <span id="dailyCost">₹0</span></h4>
+                        <p class="summary-detail" id="costBreakdown">Including overtime</p>
                     </div>
                     <div class="summary-card">
-                        <h4>Employment Types: <span id="employmentBreakdown"></span></h4>
+                        <h4>Employment Types</h4>
+                        <div class="employment-legend" id="employmentLegend">
+                        </div>
                     </div>
                 </div>
 
                 <div class="attendance-grid">
                     <div class="available-laborers">
-                        <h3>Available Laborers</h3>
+                        <div class="section-header">
+                            <h3>Available Laborers</h3>
+                            <div class="laborer-filters">
+                                <select id="availableRoleFilter" class="form-control form-control--sm">
+                                    <option value="">All Roles</option>
+                                    <option value="Mason">Mason</option>
+                                    <option value="Helper">Helper</option>
+                                    <option value="Electrician">Electrician</option>
+                                    <option value="Plumber">Plumber</option>
+                                </select>
+                            </div>
+                        </div>
                         <div id="availableLaborers" class="laborers-list">
                         </div>
                     </div>
@@ -160,27 +277,70 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Enhanced Labor Management Page -->
-            <div id="laborers" class="page">
-                <div class="page-header">
-                    <div>
-                        <h1>Labor Management</h1>
-                        <p class="text-secondary">Manage laborers with comprehensive rate analytics</p>
-                    </div>
-                    <button class="btn btn--primary" id="addLaborerBtn">
-                        <i class="fas fa-plus"></i> Add Laborer
-                    </button>
-                </div>
-
-                <div class="search-bar">
-                    <input type="text" id="laborerSearch" placeholder="Search laborers..." class="form-control">
-                </div>
-
-                <div class="laborers-enhanced-grid" id="laborersEnhancedGrid">
-                </div>
-            </div>
         </main>
+    </div>
+
+    <!-- Enhanced Laborer Modal -->
+    <div id="laborerModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="laborerModalTitle">Add Laborer</h3>
+                <button class="close-btn" onclick="closeLaborerModal()">&times;</button>
+            </div>
+            <form id="laborerForm" class="modal-body">
+                <input type="hidden" id="laborerId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Name *</label>
+                        <input type="text" id="laborerName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone *</label>
+                        <input type="tel" id="laborerPhone" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Role *</label>
+                        <select id="laborerRole" class="form-control" required>
+                            <option value="">Select Role</option>
+                            <option value="Mason">Mason</option>
+                            <option value="Helper">Helper</option>
+                            <option value="Electrician">Electrician</option>
+                            <option value="Plumber">Plumber</option>
+                            <option value="Carpenter">Carpenter</option>
+                            <option value="Painter">Painter</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Skill Level *</label>
+                        <select id="laborerSkillLevel" class="form-control" required>
+                            <option value="">Select Skill Level</option>
+                            <option value="Helper">Helper</option>
+                            <option value="Skilled">Skilled</option>
+                            <option value="Expert">Expert</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Daily Rate (₹) *</label>
+                        <input type="number" id="laborerRate" class="form-control" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status</label>
+                        <select id="laborerStatus" class="form-control">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn--outline" onclick="closeLaborerModal()">Cancel</button>
+                    <button type="submit" class="btn btn--primary">Save Laborer</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Enhanced Project Modal -->
@@ -188,7 +348,7 @@
         <div class="modal-content modal-lg">
             <div class="modal-header">
                 <h3 id="projectModalTitle">Add Project</h3>
-                <button class="close-btn" id="closeProjectModalBtn">&times;</button>
+                <button class="close-btn" onclick="closeProjectModal()">&times;</button>
             </div>
             <form id="projectForm" class="modal-body">
                 <input type="hidden" id="projectId">
@@ -196,52 +356,63 @@
                     <div class="form-group">
                         <label class="form-label">Project Name *</label>
                         <input type="text" id="projectName" class="form-control" required>
-                        <div class="error-message" id="projectNameError"></div>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Location *</label>
                         <input type="text" id="projectLocation" class="form-control" required>
-                        <div class="error-message" id="projectLocationError"></div>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Start Date *</label>
                         <input type="date" id="projectStartDate" class="form-control" required>
-                        <div class="error-message" id="projectStartDateError"></div>
                     </div>
                     <div class="form-group">
                         <label class="form-label">End Date *</label>
                         <input type="date" id="projectEndDate" class="form-control" required>
-                        <div class="error-message" id="projectEndDateError"></div>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Budget (₹) *</label>
                         <input type="number" id="projectBudget" class="form-control" required min="0">
-                        <div class="error-message" id="projectBudgetError"></div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Progress (%)</label>
-                        <input type="number" id="projectProgress" class="form-control" min="0" max="100" value="0">
-                        <div class="error-message" id="projectProgressError"></div>
+                        <label class="form-label">Status</label>
+                        <select id="projectStatus" class="form-control">
+                            <option value="Not Started">Not Started</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                            <option value="On Hold">On Hold</option>
+                        </select>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Status</label>
-                    <select id="projectStatus" class="form-control">
-                        <option value="Not Started">Not Started</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="Completed">Completed</option>
-                        <option value="On Hold">On Hold</option>
-                    </select>
+                    <label class="form-label">Progress (%)</label>
+                    <input type="range" id="projectProgress" class="form-range" min="0" max="100" value="0" oninput="updateProgressValue(this.value)">
+                    <div class="progress-display">
+                        <span id="progressValue">0</span>%
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn--outline" id="cancelProjectBtn">Cancel</button>
+                    <button type="button" class="btn btn--outline" onclick="closeProjectModal()">Cancel</button>
                     <button type="submit" class="btn btn--primary">Save Project</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Project Details Modal -->
+    <div id="projectDetailsModal" class="modal hidden">
+        <div class="modal-content modal-xl">
+            <div class="modal-header">
+                <h3 id="projectDetailsTitle">Project Details</h3>
+                <button class="close-btn" onclick="closeProjectDetailsModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="project-details-content" id="projectDetailsContent">
+                </div>
+            </div>
         </div>
     </div>
 
@@ -250,134 +421,54 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 id="materialModalTitle">Add Material Cost</h3>
-                <button class="close-btn" id="closeMaterialModalBtn">&times;</button>
+                <button class="close-btn" onclick="closeMaterialModal()">&times;</button>
             </div>
             <form id="materialForm" class="modal-body">
                 <input type="hidden" id="materialProjectId">
                 <input type="hidden" id="materialId">
-                <div class="form-group">
-                    <label class="form-label">Date *</label>
-                    <input type="date" id="materialDate" class="form-control" required>
-                    <div class="error-message" id="materialDateError"></div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Item *</label>
+                        <input type="text" id="materialItem" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Quantity *</label>
+                        <input type="text" id="materialQuantity" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Cost (₹) *</label>
+                        <input type="number" id="materialCost" class="form-control" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Date *</label>
+                        <input type="date" id="materialDate" class="form-control" required>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Description *</label>
-                    <input type="text" id="materialDescription" class="form-control" required>
-                    <div class="error-message" id="materialDescriptionError"></div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Category *</label>
-                    <select id="materialCategory" class="form-control" required>
-                        <option value="">Select Category</option>
-                        <option value="Raw Materials">Raw Materials</option>
-                        <option value="Electrical">Electrical</option>
-                        <option value="Plumbing">Plumbing</option>
-                        <option value="HVAC">HVAC</option>
-                        <option value="Facade">Facade</option>
-                        <option value="Structural">Structural</option>
-                        <option value="Other">Other</option>
-                    </select>
-                    <div class="error-message" id="materialCategoryError"></div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Amount (₹) *</label>
-                    <input type="number" id="materialAmount" class="form-control" required min="0">
-                    <div class="error-message" id="materialAmountError"></div>
+                    <label class="form-label">Supplier</label>
+                    <input type="text" id="materialSupplier" class="form-control">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn--outline" id="cancelMaterialBtn">Cancel</button>
-                    <button type="submit" class="btn btn--primary">Save Material Cost</button>
+                    <button type="button" class="btn btn--outline" onclick="closeMaterialModal()">Cancel</button>
+                    <button type="submit" class="btn btn--primary">Save Material</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Assignment Modal -->
-    <div id="assignmentModal" class="modal hidden">
-        <div class="modal-content">
+    <!-- Employment Type Selection Modal -->
+    <div id="employmentTypeModal" class="modal hidden">
+        <div class="modal-content modal-sm">
             <div class="modal-header">
-                <h3>Assign Laborer</h3>
-                <button class="close-btn" id="closeAssignmentModalBtn">&times;</button>
+                <h3>Select Employment Type</h3>
+                <button class="close-btn" onclick="closeEmploymentTypeModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <input type="hidden" id="assignLaborerId">
-                <div class="form-group">
-                    <label class="form-label">Select Project *</label>
-                    <select id="assignProjectId" class="form-control" required>
-                        <option value="">Select Project</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Employment Type *</label>
-                    <select id="employmentType" class="form-control" required>
-                        <option value="normal">Normal (1.0x)</option>
-                        <option value="overtime">Overtime (1.5x)</option>
-                        <option value="double_shift">Double Shift (2.0x)</option>
-                        <option value="night_shift">Night Shift (1.25x)</option>
-                        <option value="holiday">Holiday (2.0x)</option>
-                    </select>
-                </div>
-                <div class="assignment-cost-preview">
-                    <p>Base Rate: <span id="baseRate">₹0</span></p>
-                    <p>Final Rate: <span id="finalRate">₹0</span></p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn--outline" id="cancelAssignmentBtn">Cancel</button>
-                    <button type="button" class="btn btn--primary" id="confirmAssignmentBtn">Assign</button>
+                <div class="employment-types" id="employmentTypesList">
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Enhanced Laborer Modal -->
-    <div id="laborerModal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="laborerModalTitle">Add Laborer</h3>
-                <button class="close-btn" id="closeLaborerModalBtn">&times;</button>
-            </div>
-            <form id="laborerForm" class="modal-body">
-                <input type="hidden" id="laborerId">
-                <div class="form-group">
-                    <label class="form-label">Name *</label>
-                    <input type="text" id="laborerName" class="form-control" required>
-                    <div class="error-message" id="laborerNameError"></div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Role *</label>
-                    <select id="laborerRole" class="form-control" required>
-                        <option value="">Select Role</option>
-                        <option value="Mason">Mason</option>
-                        <option value="Helper">Helper</option>
-                        <option value="Electrician">Electrician</option>
-                        <option value="Plumber">Plumber</option>
-                        <option value="Carpenter">Carpenter</option>
-                        <option value="Painter">Painter</option>
-                    </select>
-                    <div class="error-message" id="laborerRoleError"></div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Daily Rate (₹) *</label>
-                    <input type="number" id="laborerRate" class="form-control" required min="0">
-                    <div class="error-message" id="laborerRateError"></div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Phone *</label>
-                    <input type="tel" id="laborerPhone" class="form-control" required pattern="[0-9]{10}">
-                    <div class="error-message" id="laborerPhoneError"></div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Status</label>
-                    <select id="laborerStatus" class="form-control">
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                    </select>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn--outline" id="cancelLaborerBtn">Cancel</button>
-                    <button type="submit" class="btn btn--primary">Save Laborer</button>
-                </div>
-            </form>
         </div>
     </div>
 
@@ -389,12 +480,17 @@
             </div>
             <div class="modal-body">
                 <p id="confirmMessage">Are you sure you want to proceed?</p>
+                <div id="confirmDetails" class="confirm-details"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn--outline" id="cancelConfirmBtn">Cancel</button>
-                <button type="button" class="btn btn--primary" id="confirmActionBtn">Confirm</button>
+                <button type="button" class="btn btn--outline" onclick="closeConfirmModal()">Cancel</button>
+                <button type="button" class="btn btn--primary" id="confirmButton" onclick="confirmAction()">Confirm</button>
             </div>
         </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container">
     </div>
 
     <script src="app.js"></script>
