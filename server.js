@@ -34,12 +34,12 @@ app.use(session({
     }
 }));
 
-// Serve static files
-app.use(express.static(path.join(__dirname)));
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Protected route
 app.get('/', isAuthenticated, (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Login endpoint
