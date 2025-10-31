@@ -786,8 +786,8 @@ select.form-control {
 }
 
 .sidebar-footer {
-    padding: var(--space-16);
-    border-top: 1px solid var(--color-border);
+  padding: var(--space-16);
+  border-top: 1px solid var(--color-border);
 }
 
 .nav-menu li {
