@@ -27,7 +27,11 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'a-weak-secret-for-dev', // Use an environment variable in production
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false } // Set to true if using HTTPS
+    cookie: { 
+        secure: false, // Set to true if using HTTPS
+        httpOnly: true,
+        sameSite: 'lax'
+    }
 }));
 
 // Serve static files
