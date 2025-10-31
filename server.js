@@ -26,7 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(session({
     secret: process.env.SESSION_SECRET || 'a-weak-secret-for-dev', // Use an environment variable in production
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: { secure: false } // Set to true if using HTTPS
 }));
 
