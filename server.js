@@ -30,14 +30,6 @@ app.use(session({
     cookie: { secure: false } // Set to true if using HTTPS
 }));
 
-// Protected route
-app.get('/', isAuthenticated, (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// Serve static files
-app.use(express.static(path.join(__dirname)));
-
 // Login endpoint
 app.post('/login', (req, res) => {
     const { username, password, role } = req.body;
@@ -68,6 +60,14 @@ app.get('/check-auth', (req, res) => {
         res.status(401).json({ authenticated: false });
     }
 });
+
+// Protected route
+app.get('/', isAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Serve static files
+app.use(express.static(path.join(__dirname)));
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
