@@ -987,7 +987,11 @@ function unassignLaborer(laborerId) {
 
     if (assignmentFound) {
         const laborer = appState.laborers.find((l) => l.id === laborerId);
-        showToast(`${laborer.name} unassigned`, 'info');
+        if (laborer) {
+            showToast(`${laborer.name} unassigned`, 'info');
+        } else {
+            showToast(`Laborer unassigned`, 'info');
+        }
     }
 
     loadAttendance();
