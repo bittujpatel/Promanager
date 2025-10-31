@@ -65,12 +65,8 @@ app.post('/logout', (req, res) => {
 });
 
 // Check-auth endpoint
-app.get('/check-auth', (req, res) => {
-    if (req.session.user) {
-        res.status(200).json({ authenticated: true, user: req.session.user });
-    } else {
-        res.status(401).json({ authenticated: false });
-    }
+app.get('/check-auth', isAuthenticated, (req, res) => {
+    res.status(200).json({ authenticated: true, user: req.session.user });
 });
 
 app.listen(port, () => {
