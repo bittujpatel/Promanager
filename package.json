@@ -1,0 +1,28 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bittujpatel/Promanager.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/bittujpatel/Promanager/issues"
+  },
+  "homepage": "https://github.com/bittujpatel/Promanager#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "express-session": "^1.18.2"
+  }
+}
