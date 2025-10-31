@@ -14,10 +14,10 @@ const isAuthenticated = (req, res, next) => {
     }
 };
 
-// Dummy user data
+// Dummy user data - in a real application, this would be a database
 const users = {
-    admin: { password: 'adminpassword', role: 'admin' },
-    user: { password: 'userpassword', role: 'user' }
+    admin: { password: process.env.ADMIN_PASSWORD || 'adminpassword', role: 'admin' },
+    user: { password: process.env.USER_PASSWORD || 'userpassword', role: 'user' }
 };
 
 app.use(express.json());
@@ -26,21 +26,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(session({
     secret: process.env.SESSION_SECRET || 'a-weak-secret-for-dev', // Use an environment variable in production
     resave: false,
-    saveUninitialized: false,
-    cookie: { 
-        secure: false, // Set to true if using HTTPS
-        httpOnly: true,
-        sameSite: 'lax'
-    }
+    saveUninitialized: true,
+    cookie: { secure: false } // Set to true if using HTTPS
 }));
-
-// Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Protected route
-app.get('/', isAuthenticated, (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
 
 // Login endpoint
 app.post('/login', (req, res) => {
@@ -65,8 +53,26 @@ app.post('/logout', (req, res) => {
 });
 
 // Check-auth endpoint
-app.get('/check-auth', isAuthenticated, (req, res) => {
-    res.status(200).json({ authenticated: true, user: req.session.user });
+app.get('/check-auth', (req, res) => {
+    if (req.session.user) {
+        res.status(200).json({ authenticated: true, user: req.session.user });
+    } else {
+        res.status(401).json({ authenticated: false });
+    }
+});
+
+// Protected route
+app.get('/', isAuthenticated, (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Serve static files, but exclude index.html
+app.use((req, res, next) => {
+    if (req.path === '/index.html' || req.path === '/') {
+        // Do not serve index.html via static middleware
+        return next();
+    }
+    express.static(path.join(__dirname))(req, res, next);
 });
 
 app.listen(port, () => {

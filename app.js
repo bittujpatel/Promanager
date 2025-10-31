@@ -128,6 +128,7 @@ let charts = {
 // Initialize Application
 document.addEventListener('DOMContentLoaded', function() {
     initializeNavigation();
+    initializeLogout();
     initializeDatePicker();
     initializeSearch();
     initializeForms();
@@ -145,6 +146,25 @@ function initializeNavigation() {
             showPage(page);
         });
     });
+}
+
+function initializeLogout() {
+    const logoutButton = document.getElementById('logoutButton');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                const response = await fetch('/logout', {
+                    method: 'POST'
+                });
+                if (response.ok) {
+                    window.location.href = '/login.html';
+                }
+            } catch (error) {
+                console.error('Logout failed:', error);
+            }
+        });
+    }
 }
 
 function showPage(pageId) {
