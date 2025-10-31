@@ -66,8 +66,14 @@ app.get('/', isAuthenticated, (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Serve static files
-app.use(express.static(path.join(__dirname)));
+// Serve static files, but exclude index.html
+app.use((req, res, next) => {
+    if (req.path === '/index.html' || req.path === '/') {
+        // Do not serve index.html via static middleware
+        return next();
+    }
+    express.static(path.join(__dirname))(req, res, next);
+});
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
