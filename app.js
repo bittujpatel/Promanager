@@ -973,17 +973,47 @@ function assignLaborerToProject(laborerId, projectId, employmentType = 'normal')
 
 function unassignLaborer(laborerId) {
     const date = appState.currentDate;
-    
-    if (appState.attendance[date]) {
-        Object.keys(appState.attendance[date]).forEach(projectId => {
-            appState.attendance[date][projectId] = appState.attendance[date][projectId].filter(assignment => 
-                assignment.laborerId !== laborerId
-            );
-        });
+
+    if (!appState.attendance[date]) {
+        loadAttendance();
+        return;
     }
-    
-    const laborer = appState.laborers.find(l => l.id === laborerId);
-    showToast(`${laborer.name} unassigned`, 'info');
+
+    let assignmentFound = false;
+    for (const projectId in appState.attendance[date]) {
+        const assignmentIndex = appState.attendance[date][projectId].findIndex(
+            (a) => a.laborerId === laborerId
+        );
+
+        if (assignmentIndex !== -1) {
+            const assignment = appState.attendance[date][projectId][assignmentIndex];
+            const laborer = appState.laborers.find((l) => l.id === laborerId);
+
+            if (laborer) {
+                const employmentMultiplier =
+                    appState.employmentTypes.find(
+                        (et) => et.id === assignment.employmentType
+                    )?.multiplier || 1.0;
+
+                laborer.totalDaysWorked = Math.max(0, laborer.totalDaysWorked - 1);
+                laborer.totalEarnings = Math.max(0, laborer.totalEarnings - laborer.dailyRate * employmentMultiplier);
+            }
+
+            appState.attendance[date][projectId].splice(assignmentIndex, 1);
+            assignmentFound = true;
+            break;
+        }
+    }
+
+    if (assignmentFound) {
+        const laborer = appState.laborers.find((l) => l.id === laborerId);
+        if (laborer) {
+            showToast(`${laborer.name} unassigned`, 'info');
+        } else {
+            showToast(`Laborer unassigned`, 'info');
+        }
+    }
+
     loadAttendance();
 }
 
